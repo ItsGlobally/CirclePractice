@@ -18,31 +18,82 @@ public class ArenaManager {
 
     private final int arenaSize = 1000; // distance between arenas
     private final int yLevel = 50;
-    private final int gridMin = 0; // min grid index
-    private final int gridMax = 1000; // max grid index
+    private final int gridMin = 1; // min grid index
+    private final int gridMax = 41; // max grid index
+    private final List<File> schematicFiles;
 
     private final World world;
+    private final Map<String, List<File>> kitToSchematics;
 
     public ArenaManager(CirclePractice plugin) {
         this.plugin = plugin;
         this.arenas = new HashMap<>();
         this.rand = new Random();
+        this.schematicFiles = new ArrayList<>();
+        this.kitToSchematics = new HashMap<>();
         this.world = Bukkit.getWorld("ffa");
+        loadArenas();
     }
 
-    public void createArena(String name, Location pos1, Location pos2, Location spectator) {
-        Arena arena = new Arena(name);
-        arena.setPos1(pos1);
-        arena.setPos2(pos2);
-        arena.setSpectatorSpawn(spectator);
-        arenas.put(name, arena);
+    /**
+     * Loads all schematic files and maps them to kits
+     */
+    public void loadArenas() {
+        schematicFiles.clear();
+        kitToSchematics.clear();
+
+        File schemFolder = new File("plugins/WorldEdit/schematics");
+        if (!schemFolder.exists() || !schemFolder.isDirectory()) {
+            Bukkit.getLogger().warning("[CirclePractice] Schematics folder not found: " + schemFolder.getAbsolutePath());
+            return;
+        }
+
+        File[] files = schemFolder.listFiles((dir, name) -> name.toLowerCase().endsWith(".schematic"));
+        if (files != null) {
+            for (File f : files) {
+                schematicFiles.add(f);
+
+                // Remove extension
+                String baseName = f.getName().substring(0, f.getName().lastIndexOf('.'));
+
+                // Split by "-" or "_"
+                String[] parts = baseName.toLowerCase().split("[-_]");
+                for (String kit : parts) {
+                    kitToSchematics.computeIfAbsent(kit, k -> new ArrayList<>()).add(f);
+                }
+            }
+        }
+
+        Bukkit.getLogger().info("[CirclePractice] Loaded " + schematicFiles.size() + " schematic(s).");
     }
 
+    /**
+     * Get schematic file paths for a kit
+     */
+    public List<String> getArenaFiles(String kit) {
+        List<File> files = kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList());
+        List<String> result = new ArrayList<>();
+        for (File f : files) {
+            result.add(f.getAbsolutePath());
+        }
+        return result;
+    }
+
+    /**
+     * Optional: get the raw File list
+     */
+    public List<File> getArenaFilesAsFiles(String kit) {
+        return new ArrayList<>(kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList()));
+    }
+
+    public List<File> getAllSchematics() {
+        return new ArrayList<>(schematicFiles); // defensive copy
+    }
     public Arena getArena(String name) {
         return arenas.get(name);
     }
 
-    public Arena getAvailableArena() {
+    public Arena getAvailableArena(String kit) {
         List<Arena> freeArenas = arenas.values().stream()
                 .filter(arena -> !arena.isInUse() && arena.isComplete())
                 .toList();
@@ -53,41 +104,87 @@ public class ArenaManager {
             return chosen;
         }
 
+        createArena(kit);
+
+        List<Arena> freeArenasAfterCreate = arenas.values().stream()
+                .filter(arena -> !arena.isInUse() && arena.isComplete())
+                .toList();
+
+        if (!freeArenasAfterCreate.isEmpty()) {
+            Arena chosen = freeArenasAfterCreate.get(rand.nextInt(freeArenasAfterCreate.size()));
+            chosen.setInUse(true);
+            return chosen;
+        }
+
+        return null;
+    }
+
+
+    private void createArena(String kit) {
+        // Pick a random schematic that matches this kit
+        List<File> matchingSchematics = kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList());
+        if (matchingSchematics.isEmpty()) {
+            Bukkit.getLogger().warning("[CirclePractice] No schematics found for kit: " + kit);
+            return;
+        }
+        File chosenSchematic = matchingSchematics.get(rand.nextInt(matchingSchematics.size()));
+
+        // Pick random grid position
         int xIndex = rand.nextInt(gridMax - gridMin + 1) + gridMin;
         int zIndex = rand.nextInt(gridMax - gridMin + 1) + gridMin;
 
-        int x = xIndex * arenaSize;
-        int z = zIndex * arenaSize;
+        int originX = xIndex * arenaSize;
+        int originZ = zIndex * arenaSize;
         int y = yLevel;
-        Location spectator = new Location(world, x, y, z);
-        Location player1Spawn = new Location(world, x - 25, y, z);
-        Location player2Spawn = new Location(world, x + 25, y, z);
 
-        String arenaName = "Arena-" + xIndex + "-" + zIndex;
+        Bukkit.broadcastMessage("Generating arena at: " + xIndex + "," + zIndex);
+        Bukkit.broadcastMessage("Origin: " + originX + "," + originZ + "," + y);
+        Bukkit.broadcastMessage("Using schematic: " + chosenSchematic.getName());
+
+        try {
+            // Paste chosen schematic
+            ArenaPasteWE6.pasteSchematicAt(
+                    world,
+                    chosenSchematic.getAbsolutePath(),
+                    originX,
+                    y,
+                    originZ,
+                    -26, -26, true
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Spawns
+        Location spectator = new Location(world, originX, y + 10, originZ);
+        Location player1Spawn = new Location(world, originX + 25, y + 1, originZ);
+        Location player2Spawn = new Location(world, originX - 25, y + 1, originZ);
+
+        Bukkit.broadcastMessage("P1 Spawn: " + player1Spawn);
+        Bukkit.broadcastMessage("P2 Spawn: " + player2Spawn);
+
+        // Arena registration
+        String arenaName = kit + "-" + xIndex + "-" + zIndex;
         Arena arena = new Arena(arenaName);
         arena.setPos1(player1Spawn);
         arena.setPos2(player2Spawn);
         arena.setSpectatorSpawn(spectator);
         arena.setInUse(true);
 
-        File schemname = new File(plugin.getDataFolder().getAbsoluteFile()+ "plugins/WorldEdit/schematics/duels.schematic");
-
-        try {
-            ArenaPasteWE6.pasteSchematicAt(world, schemname, x, y, z, true);
-        } catch (Exception e) {
-            e.printStackTrace();
+        // Add all kits from schematic name
+        String baseName = chosenSchematic.getName().substring(0, chosenSchematic.getName().lastIndexOf('.'));
+        String[] parts = baseName.toLowerCase().split("[-_]");
+        for (String k : parts) {
+            arena.addKits(k);
         }
 
         arenas.put(arenaName, arena);
-        return arena;
-
     }
+
+
+
 
     public Map<String, Arena> getAllArenas() {
         return arenas;
-    }
-
-    public void releaseArena(Arena arena) {
-        if (arena != null) arena.setInUse(false);
     }
 }

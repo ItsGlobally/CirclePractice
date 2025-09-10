@@ -2,6 +2,9 @@ package me.itsglobally.circlePractice.data;
 
 import org.bukkit.Location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Arena {
 
     private final String name;
@@ -9,6 +12,7 @@ public class Arena {
     private Location pos2;
     private Location spectatorSpawn;
     private boolean inUse;
+    private final List<String> kits = new ArrayList<>();
 
     public Arena(String name) {
         this.name = name;
@@ -54,5 +58,12 @@ public class Arena {
 
     public boolean isComplete() {
         return pos1 != null && pos2 != null && spectatorSpawn != null;
+    }
+
+    public void addKits(String kit) {
+        kits.add(kit);
+    }
+    public List<String> getKits() {
+        return kits;
     }
 }

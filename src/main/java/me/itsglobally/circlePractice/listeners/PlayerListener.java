@@ -26,7 +26,7 @@ public class PlayerListener implements Listener {
 
     private final CirclePractice plugin = CirclePractice.getInstance();
 
-    List<Location> blockplaced = new ArrayList<>();
+
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -56,54 +56,7 @@ public class PlayerListener implements Listener {
         plugin.getPlayerManager().removePlayer(player.getUniqueId());
     }
 
-    @EventHandler
-    public void onPlace(BlockPlaceEvent e) {
-        Player player = e.getPlayer();
-        PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
-        if (pP.getState() == PracticePlayer.PlayerState.SPECTATING) {
-            e.setCancelled(true);
-            MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
-        }
-        if (pP.getState() == PracticePlayer.PlayerState.DUEL) {
-            Duel cD = plugin.getPlayerManager().getPlayer(player.getUniqueId()).getCurrentDuel();
-            Kit k = plugin.getKitManager().getKit(cD.getKit());
-            if (!k.canBuild()) {
-                e.setCancelled(true);
-                MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
-                return;
-            }
-            Material against = e.getBlockAgainst().getType();
-            if (against == Material.WATER || against == Material.STATIONARY_WATER || against == Material.LAVA || against == Material.STATIONARY_LAVA) {
-                MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
-                e.setCancelled(true);
-                return;
-            }
-            blockplaced.add(e.getBlockPlaced().getLocation());
-        }
-    }
 
-    @EventHandler
-    public void onBreak(BlockBreakEvent e) {
-        Player player = e.getPlayer();
-        PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
-        if (pP.getState() == PracticePlayer.PlayerState.SPECTATING) {
-            e.setCancelled(true);
-            MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
-        }
-        if (pP.getState() == PracticePlayer.PlayerState.DUEL) {
-            Duel cD = plugin.getPlayerManager().getPlayer(player.getUniqueId()).getCurrentDuel();
-            Kit k = plugin.getKitManager().getKit(cD.getKit());
-            if (!k.canBuild()) {
-                e.setCancelled(true);
-                MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
-                return;
-            }
-            if (!blockplaced.contains(e.getBlock().getLocation())) {
-                e.setCancelled(true);
-                MessageUtil.sendActionBar(player, "&cYou can only place blocks that placed by player!");
-            }
-        }
-    }
 
     @EventHandler
     public void onMessage(AsyncPlayerChatEvent e) {

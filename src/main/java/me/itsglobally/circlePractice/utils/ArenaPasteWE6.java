@@ -14,20 +14,28 @@ import java.io.File;
 public class ArenaPasteWE6 {
 
     public static void pasteSchematicAt(World bukkitWorld,
-                                        File schematicFile,
-                                        int x, int y, int z,
+                                        String schematicName,
+                                        int x, int y, int z, int xoffset, int zoffset,
                                         boolean pasteAir) throws Exception {
 
-        CuboidClipboard clipboard = MCEditSchematicFormat
-                .getFormat(schematicFile)
-                .load(schematicFile);
+        File schematicFile = new File("plugins/WorldEdit/schematics", schematicName + ".schematic");
 
+        if (!schematicFile.exists()) {
+            throw new IllegalArgumentException("Schematic file not found: " + schematicFile.getAbsolutePath());
+        }
+
+        MCEditSchematicFormat format = (MCEditSchematicFormat) MCEditSchematicFormat.getFormat(schematicFile);
+        if (format == null) {
+            throw new IllegalArgumentException("Unknown schematic format for: " + schematicFile.getName());
+        }
+
+        CuboidClipboard clipboard = format.load(schematicFile);
         EditSession editSession = new EditSession(new BukkitWorld(bukkitWorld), Integer.MAX_VALUE);
 
-        // Align schematic origin to the target corner
-        Vector pasteAt = new Vector(x, y, z).subtract(clipboard.getOffset());
+        Vector pasteAt = new Vector(x + xoffset, y, z + zoffset).subtract(clipboard.getOffset());
 
         clipboard.paste(editSession, pasteAt, !pasteAir);
         editSession.flushQueue();
     }
+
 }

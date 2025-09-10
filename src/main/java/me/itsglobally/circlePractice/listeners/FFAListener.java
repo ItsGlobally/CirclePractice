@@ -39,30 +39,34 @@ public class FFAListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
-        if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
-            e.setCancelled(true);
-            return;
-        }
-        if (e instanceof EntityDamageByEntityEvent edbee) {
-            Entity dmgere = edbee.getDamager();
-            Entity vice = e.getEntity();
-            if (!(vice instanceof Player vic)) {
+        if (!(e.getEntity() instanceof Player player)) return;
+        PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
+        if (pP.getState() == PracticePlayer.PlayerState.FFA) {
+            if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 e.setCancelled(true);
                 return;
             }
-            if (!(dmgere instanceof Player dmger)) {
-                e.setCancelled(true);
-                return;
-            }
-            if (vic.getLocation().getY() <= 200 || dmger.getLocation().getY() <= 200) {
-                e.setCancelled(true);
-                return;
-            }
-            TempData.setLastHit(vic.getUniqueId(), dmger.getUniqueId());
-            TempData.setLastHit(dmger.getUniqueId(), vic.getUniqueId());
-            if (vic.getHealth() < e.getFinalDamage()) {
-                e.setCancelled(true);
-                plugin.getFFAManager().kill(vic, dmger);
+            if (e instanceof EntityDamageByEntityEvent edbee) {
+                Entity dmgere = edbee.getDamager();
+                Entity vice = e.getEntity();
+                if (!(vice instanceof Player vic)) {
+                    e.setCancelled(true);
+                    return;
+                }
+                if (!(dmgere instanceof Player dmger)) {
+                    e.setCancelled(true);
+                    return;
+                }
+                if (vic.getLocation().getY() <= 200 || dmger.getLocation().getY() <= 200) {
+                    e.setCancelled(true);
+                    return;
+                }
+                TempData.setLastHit(vic.getUniqueId(), dmger.getUniqueId());
+                TempData.setLastHit(dmger.getUniqueId(), vic.getUniqueId());
+                if (vic.getHealth() < e.getFinalDamage()) {
+                    e.setCancelled(true);
+                    plugin.getFFAManager().kill(vic, dmger);
+                }
             }
         }
     }

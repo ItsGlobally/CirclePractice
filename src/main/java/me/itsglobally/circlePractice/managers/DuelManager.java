@@ -113,7 +113,7 @@ public class DuelManager {
         }
 
         // Get available arena
-        Arena arena = plugin.getArenaManager().getAvailableArena();
+        Arena arena = plugin.getArenaManager().getAvailableArena(kit);
         if (arena == null) {
             MessageUtil.sendMessage(player1, "&cNo arenas are available right now!");
             MessageUtil.sendMessage(player2, "&cNo arenas are available right now!");
