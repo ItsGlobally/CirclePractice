@@ -14,11 +14,9 @@ public class ConfigManager {
 
     private final CirclePractice plugin;
     private FileConfiguration config;
-    private FileConfiguration arenas;
     private FileConfiguration kits;
 
     private File configFile;
-    private File arenasFile;
     private File kitsFile;
 
     public ConfigManager(CirclePractice plugin) {
@@ -33,16 +31,6 @@ public class ConfigManager {
         }
         config = plugin.getConfig();
 
-        // Arenas config
-        arenasFile = new File(plugin.getDataFolder(), "arenas.yml");
-        if (!arenasFile.exists()) {
-            try {
-                arenasFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        arenas = YamlConfiguration.loadConfiguration(arenasFile);
 
         // Kits config
         kitsFile = new File(plugin.getDataFolder(), "kits.yml");
@@ -86,14 +74,6 @@ public class ConfigManager {
         }
     }
 
-    public void saveArenas() {
-        try {
-            arenas.save(arenasFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void saveKits() {
         try {
             kits.save(kitsFile);
@@ -104,10 +84,6 @@ public class ConfigManager {
 
     public FileConfiguration getConfig() {
         return config;
-    }
-
-    public FileConfiguration getArenas() {
-        return arenas;
     }
 
     public FileConfiguration getKits() {

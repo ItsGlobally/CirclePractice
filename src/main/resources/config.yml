@@ -2,7 +2,7 @@
 
 # Default spawn location
 spawn:
-  world: world
+  world: ffa
   x: 0.5
   y: 1.0
   z: 0.5
@@ -18,7 +18,7 @@ settings:
   duel-time: 900
 
   # Whether spectators are allowed
-  spectator-enabled: false
+  spectator-enabled: true
 
 # Coin rewards for different activities
 rewards:
