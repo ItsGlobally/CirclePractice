@@ -16,20 +16,21 @@ public class ArenaManager {
     private final Map<String, Arena> arenas;
     private final Random rand;
 
-    private final int arenaSize = 1000; // distance between arenas
+    private final int arenaSize = 1000;
     private final int yLevel = 50;
-    private final int gridMin = 1; // min grid index
-    private final int gridMax = 41; // max grid index
-    private final List<File> schematicFiles;
+    private final int gridMin = 1;
+    private final int gridMax = 41;
+
+    private final List<String> schematicPaths;
+    private final Map<String, List<String>> kitToSchematics;
 
     private final World world;
-    private final Map<String, List<File>> kitToSchematics;
 
     public ArenaManager(CirclePractice plugin) {
         this.plugin = plugin;
         this.arenas = new HashMap<>();
         this.rand = new Random();
-        this.schematicFiles = new ArrayList<>();
+        this.schematicPaths = new ArrayList<>();
         this.kitToSchematics = new HashMap<>();
         this.world = Bukkit.getWorld("ffa");
         loadArenas();
@@ -39,7 +40,7 @@ public class ArenaManager {
      * Loads all schematic files and maps them to kits
      */
     public void loadArenas() {
-        schematicFiles.clear();
+        schematicPaths.clear();
         kitToSchematics.clear();
 
         File schemFolder = new File("plugins/WorldEdit/schematics");
@@ -51,7 +52,8 @@ public class ArenaManager {
         File[] files = schemFolder.listFiles((dir, name) -> name.toLowerCase().endsWith(".schematic"));
         if (files != null) {
             for (File f : files) {
-                schematicFiles.add(f);
+                String absPath = f.getAbsolutePath();
+                schematicPaths.add(absPath);
 
                 // Remove extension
                 String baseName = f.getName().substring(0, f.getName().lastIndexOf('.'));
@@ -59,36 +61,22 @@ public class ArenaManager {
                 // Split by "-" or "_"
                 String[] parts = baseName.toLowerCase().split("[-_]");
                 for (String kit : parts) {
-                    kitToSchematics.computeIfAbsent(kit, k -> new ArrayList<>()).add(f);
+                    kitToSchematics.computeIfAbsent(kit, k -> new ArrayList<>()).add(absPath);
                 }
             }
         }
 
-        Bukkit.getLogger().info("Loaded " + schematicFiles.size() + " schematic(s).");
+        Bukkit.getLogger().info("Loaded " + schematicPaths.size() + " schematic(s).");
     }
 
-    /**
-     * Get schematic file paths for a kit
-     */
     public List<String> getArenaFiles(String kit) {
-        List<File> files = kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList());
-        List<String> result = new ArrayList<>();
-        for (File f : files) {
-            result.add(f.getAbsolutePath());
-        }
-        return result;
-    }
-
-    /**
-     * Optional: get the raw File list
-     */
-    public List<File> getArenaFilesAsFiles(String kit) {
         return new ArrayList<>(kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList()));
     }
 
-    public List<File> getAllSchematics() {
-        return new ArrayList<>(schematicFiles); // defensive copy
+    public List<String> getAllSchematics() {
+        return new ArrayList<>(schematicPaths);
     }
+
     public Arena getArena(String name) {
         return arenas.get(name);
     }
@@ -118,23 +106,20 @@ public class ArenaManager {
                 chosen.setInUse(true);
                 return chosen;
             }
-
         }
 
         return null;
     }
 
-
     private void createArena(String kit) {
-        // Pick a random schematic that matches this kit
-        List<File> matchingSchematics = kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList());
+        List<String> matchingSchematics = kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList());
         if (matchingSchematics.isEmpty()) {
             Bukkit.getLogger().warning("No schematics found for kit: " + kit);
             return;
         }
-        File chosenSchematic = matchingSchematics.get(rand.nextInt(matchingSchematics.size()));
+        String chosenPath = matchingSchematics.get(rand.nextInt(matchingSchematics.size()));
 
-        // Pick random grid position
+
         int xIndex = rand.nextInt(gridMax - gridMin + 1) + gridMin;
         int zIndex = rand.nextInt(gridMax - gridMin + 1) + gridMin;
 
@@ -144,23 +129,14 @@ public class ArenaManager {
 
         Bukkit.broadcastMessage("Generating arena at: " + xIndex + "," + zIndex);
         Bukkit.broadcastMessage("Origin: " + originX + "," + originZ + "," + y);
-        Bukkit.broadcastMessage("Using schematic: " + chosenSchematic.getName());
+        Bukkit.broadcastMessage("Using schematic: " + chosenPath);
 
         try {
-            // Paste chosen schematic
-            ArenaPasteWE6.pasteSchematicAt(
-                    world,
-                    chosenSchematic.getAbsolutePath(),
-                    originX,
-                    y,
-                    originZ,
-                    -26, -26, true
-            );
+            ArenaPasteWE6.pasteSchematicAt(world, chosenPath, originX, y, originZ, -26, -26, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // Spawns
         Location spectator = new Location(world, originX, y + 10, originZ);
         Location player1Spawn = new Location(world, originX + 25, y + 1, originZ);
         Location player2Spawn = new Location(world, originX - 25, y + 1, originZ);
@@ -168,7 +144,6 @@ public class ArenaManager {
         Bukkit.broadcastMessage("P1 Spawn: " + player1Spawn);
         Bukkit.broadcastMessage("P2 Spawn: " + player2Spawn);
 
-        // Arena registration
         String arenaName = kit + "-" + xIndex + "-" + zIndex;
         Arena arena = new Arena(arenaName);
         arena.setPos1(player1Spawn);
@@ -176,8 +151,8 @@ public class ArenaManager {
         arena.setSpectatorSpawn(spectator);
         arena.setInUse(true);
 
-        // Add all kits from schematic name
-        String baseName = chosenSchematic.getName().substring(0, chosenSchematic.getName().lastIndexOf('.'));
+
+        String baseName = new File(chosenPath).getName().replaceFirst("[.][^.]+$", "");
         String[] parts = baseName.toLowerCase().split("[-_]");
         for (String k : parts) {
             arena.addKits(k);
@@ -185,9 +160,6 @@ public class ArenaManager {
 
         arenas.put(arenaName, arena);
     }
-
-
-
 
     public Map<String, Arena> getAllArenas() {
         return arenas;
