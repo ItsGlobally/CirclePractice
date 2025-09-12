@@ -13,7 +13,7 @@ public class PracticePlayer {
 
     private final UUID uuid;
     private final String name;
-    private final Map<String, String> kitContents; // Now stores serialized data
+    private final Map<String, String> kitContents;
     private PlayerState state;
     private Duel currentDuel;
     private String queuedKit;
@@ -110,7 +110,7 @@ public class PracticePlayer {
         if (serialized != null) {
             ItemStack[][] deserialized = InventorySerializer.deserializeInventory(serialized);
             if (deserialized != null) {
-                // Combine contents and armor into single array for backward compatibility
+
                 ItemStack[] combined = new ItemStack[deserialized[0].length + deserialized[1].length];
                 System.arraycopy(deserialized[0], 0, combined, 0, deserialized[0].length);
                 System.arraycopy(deserialized[1], 0, combined, deserialized[0].length, deserialized[1].length);

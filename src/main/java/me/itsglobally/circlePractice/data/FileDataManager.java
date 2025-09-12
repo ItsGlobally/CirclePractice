@@ -131,7 +131,7 @@ public class FileDataManager {
         data.setLastSeen(System.currentTimeMillis());
     }
 
-    public void updatePlayerStats(UUID uuid, String kit, boolean won, int eloChange) {
+    public void updatePlayerStats(UUID uuid, String kit, boolean won) {
         CachedPlayerData data = getCachedData(uuid);
         PlayerStats stats = data.getStats().getOrDefault(kit, new PlayerStats());
 

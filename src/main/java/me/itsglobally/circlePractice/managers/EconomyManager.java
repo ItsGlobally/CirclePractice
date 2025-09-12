@@ -114,7 +114,7 @@ public class EconomyManager {
         long baseReward = plugin.getConfigManager().getConfig().getLong("rewards.duel-win", 25);
         long kitMultiplier = plugin.getConfigManager().getConfig().getLong("rewards.kit-multipliers." + kit, 1);
         long totalReward = baseReward * kitMultiplier;
-        
+
         addCoins(player.getUniqueId(), totalReward);
     }
 

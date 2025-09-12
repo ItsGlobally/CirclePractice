@@ -75,7 +75,7 @@ public record FFAManager(CirclePractice plugin) {
         if (streak >= 10 && streak % 5 == 0) {
             // Reward killstreak bonus
             plugin.getEconomyManager().rewardKillstreak(klr, streak);
-            
+
             for (Player op : Bukkit.getOnlinePlayers()) {
                 op.playSound(op.getLocation(), Sound.ENDERDRAGON_GROWL, 0.75f, 2.0f);
             }

@@ -23,8 +23,8 @@ public class CoinsCommand implements NontageCommand {
             }
 
             long coins = plugin.getEconomyManager().getCoins(player.getUniqueId());
-            MessageUtil.sendMessage(player, "&eYour balance: &a" + 
-                plugin.getEconomyManager().formatBalance(coins));
+            MessageUtil.sendMessage(player, "&eYour balance: &a" +
+                    plugin.getEconomyManager().formatBalance(coins));
             return;
         }
 
@@ -32,7 +32,7 @@ public class CoinsCommand implements NontageCommand {
 
         if (subCommand.equalsIgnoreCase("balance") || subCommand.equalsIgnoreCase("bal")) {
             Player target = (sender instanceof Player) ? (Player) sender : null;
-            
+
             if (args.length == 2) {
                 target = Bukkit.getPlayer(args[1]);
                 if (target == null) {
@@ -47,10 +47,10 @@ public class CoinsCommand implements NontageCommand {
             }
 
             long coins = plugin.getEconomyManager().getCoins(target.getUniqueId());
-            String message = target.equals(sender) ? 
-                "&eYour balance: &a" + plugin.getEconomyManager().formatBalance(coins) :
-                "&e" + target.getName() + "'s balance: &a" + plugin.getEconomyManager().formatBalance(coins);
-            
+            String message = target.equals(sender) ?
+                    "&eYour balance: &a" + plugin.getEconomyManager().formatBalance(coins) :
+                    "&e" + target.getName() + "'s balance: &a" + plugin.getEconomyManager().formatBalance(coins);
+
             MessageUtil.sendMessage((Player) sender, message);
 
         } else if (subCommand.equalsIgnoreCase("give")) {
@@ -73,7 +73,7 @@ public class CoinsCommand implements NontageCommand {
             try {
                 long amount = Long.parseLong(args[2]);
                 plugin.getEconomyManager().addCoins(target.getUniqueId(), amount);
-                
+
                 MessageUtil.sendMessage((Player) sender, "&aGave &e" + amount + " coins &ato " + target.getName());
                 MessageUtil.sendMessage(target, "&aYou received &e" + amount + " coins&a!");
             } catch (NumberFormatException e) {
@@ -129,7 +129,7 @@ public class CoinsCommand implements NontageCommand {
             try {
                 long amount = Long.parseLong(args[2]);
                 plugin.getEconomyManager().setCoins(target.getUniqueId(), amount);
-                
+
                 MessageUtil.sendMessage((Player) sender, "&aSet " + target.getName() + "'s balance to &e" + amount + " coins");
                 MessageUtil.sendMessage(target, "&aYour balance has been set to &e" + amount + " coins&a!");
             } catch (NumberFormatException e) {

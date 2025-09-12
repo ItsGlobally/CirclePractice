@@ -7,13 +7,10 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.nontage.nontagelib.command.NontageCommandLoader;
 import top.nontage.nontagelib.listener.ListenerRegister;
-
-import java.net.URI;
 
 public class CirclePractice extends JavaPlugin {
 

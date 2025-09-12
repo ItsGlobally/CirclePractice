@@ -8,11 +8,11 @@ import java.util.List;
 public class Arena {
 
     private final String name;
+    private final List<String> kits = new ArrayList<>();
     private Location pos1;
     private Location pos2;
     private Location spectatorSpawn;
     private boolean inUse;
-    private final List<String> kits = new ArrayList<>();
 
     public Arena(String name) {
         this.name = name;
@@ -63,6 +63,7 @@ public class Arena {
     public void addKits(String kit) {
         kits.add(kit);
     }
+
     public List<String> getKits() {
         return kits;
     }

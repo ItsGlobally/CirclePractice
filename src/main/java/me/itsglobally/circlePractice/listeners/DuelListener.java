@@ -6,7 +6,6 @@ import me.itsglobally.circlePractice.data.Kit;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.utils.MessageUtil;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,11 +17,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import top.nontage.nontagelib.annotations.AutoListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @AutoListener
 public class DuelListener implements Listener {

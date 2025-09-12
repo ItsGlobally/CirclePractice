@@ -4,7 +4,6 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.utils.MessageUtil;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -16,7 +15,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import top.nontage.nontagelib.annotations.AutoListener;
-
 
 
 @AutoListener

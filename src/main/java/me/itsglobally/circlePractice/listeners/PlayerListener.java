@@ -1,31 +1,21 @@
 package me.itsglobally.circlePractice.listeners;
 
 import me.itsglobally.circlePractice.CirclePractice;
-import me.itsglobally.circlePractice.data.Duel;
-import me.itsglobally.circlePractice.data.Kit;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import top.nontage.nontagelib.annotations.AutoListener;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @AutoListener
 public class PlayerListener implements Listener {
 
     private final CirclePractice plugin = CirclePractice.getInstance();
-
 
 
     @EventHandler
@@ -55,7 +45,6 @@ public class PlayerListener implements Listener {
 
         plugin.getPlayerManager().removePlayer(player.getUniqueId());
     }
-
 
 
     @EventHandler

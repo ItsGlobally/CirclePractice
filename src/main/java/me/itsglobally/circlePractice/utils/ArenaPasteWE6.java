@@ -2,10 +2,10 @@ package me.itsglobally.circlePractice.utils;
 
 // ArenaPasteWE6.java
 
+import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.schematic.MCEditSchematicFormat;
 import org.bukkit.World;
 

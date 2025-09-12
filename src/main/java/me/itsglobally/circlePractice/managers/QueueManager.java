@@ -109,6 +109,7 @@ public class QueueManager {
 
     private void updateQueueInfo(Player player, String kit) {
         Queue<PracticePlayer> queue = queues.get(kit);
-        if (queue == null) return;
+        if (queue == null) {
+        }
     }
 }
