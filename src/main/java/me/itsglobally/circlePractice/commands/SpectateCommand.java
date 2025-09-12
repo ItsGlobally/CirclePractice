@@ -45,7 +45,7 @@ public class SpectateCommand implements NontageCommand {
             return;
         }
         match.getPlayer1().getPlayer().hidePlayer(p);
-        match.getPlayer1().getPlayer().showPlayer(p);
+        match.getPlayer2().getPlayer().hidePlayer(p);
         match.addSpectator(p.getUniqueId());
         p.teleport(match.getArena().getSpectatorSpawn());
 
