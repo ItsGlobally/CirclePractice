@@ -43,7 +43,7 @@ public class CirclePractice extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        DaemonManager wss;
+        /*DaemonManager wss;
         try {
             wss = new DaemonManager(new URI("ws://172.18.0.1:25502"));
             wss.connectBlocking();
@@ -53,7 +53,7 @@ public class CirclePractice extends JavaPlugin {
         }
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new phapi().register();
-        }
+        }*/
 
         instance = this;
 

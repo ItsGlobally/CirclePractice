@@ -10,6 +10,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.util.Objects;
 
+@Deprecated
 public class DaemonManager extends WebSocketClient {
     private static final String serverName = CirclePractice.serverName;
     private final Gson gson = new Gson();
