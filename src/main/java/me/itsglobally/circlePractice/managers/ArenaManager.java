@@ -44,7 +44,7 @@ public class ArenaManager {
 
         File schemFolder = new File("plugins/WorldEdit/schematics");
         if (!schemFolder.exists() || !schemFolder.isDirectory()) {
-            Bukkit.getLogger().warning("[CirclePractice] Schematics folder not found: " + schemFolder.getAbsolutePath());
+            Bukkit.getLogger().warning("Schematics folder not found: " + schemFolder.getAbsolutePath());
             return;
         }
 
@@ -64,7 +64,7 @@ public class ArenaManager {
             }
         }
 
-        Bukkit.getLogger().info("[CirclePractice] Loaded " + schematicFiles.size() + " schematic(s).");
+        Bukkit.getLogger().info("Loaded " + schematicFiles.size() + " schematic(s).");
     }
 
     /**
@@ -100,8 +100,10 @@ public class ArenaManager {
 
         if (!freeArenas.isEmpty()) {
             Arena chosen = freeArenas.get(rand.nextInt(freeArenas.size()));
-            chosen.setInUse(true);
-            return chosen;
+            if (chosen.getKits().contains(kit)) {
+                chosen.setInUse(true);
+                return chosen;
+            }
         }
 
         createArena(kit);
@@ -112,8 +114,11 @@ public class ArenaManager {
 
         if (!freeArenasAfterCreate.isEmpty()) {
             Arena chosen = freeArenasAfterCreate.get(rand.nextInt(freeArenasAfterCreate.size()));
-            chosen.setInUse(true);
-            return chosen;
+            if (chosen.getKits().contains(kit)) {
+                chosen.setInUse(true);
+                return chosen;
+            }
+
         }
 
         return null;
@@ -124,7 +129,7 @@ public class ArenaManager {
         // Pick a random schematic that matches this kit
         List<File> matchingSchematics = kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList());
         if (matchingSchematics.isEmpty()) {
-            Bukkit.getLogger().warning("[CirclePractice] No schematics found for kit: " + kit);
+            Bukkit.getLogger().warning("No schematics found for kit: " + kit);
             return;
         }
         File chosenSchematic = matchingSchematics.get(rand.nextInt(matchingSchematics.size()));
