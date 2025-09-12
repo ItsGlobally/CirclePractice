@@ -17,14 +17,12 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import top.nontage.nontagelib.annotations.AutoListener;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 @AutoListener
 public class FFAListener implements Listener {
 
     private final CirclePractice plugin = CirclePractice.getInstance();
-    List<Location> blockplaced = new ArrayList<>();
 
 
     @EventHandler
@@ -86,12 +84,12 @@ public class FFAListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            blockplaced.add(e.getBlockPlaced().getLocation());
+            TempData.addBlockPlaced(e.getBlockPlaced().getLocation());
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     e.getBlockPlaced().setType(Material.AIR);
-                    blockplaced.remove(e.getBlockPlaced().getLocation());
+                    TempData.removeBlockPlaced(e.getBlockPlaced().getLocation());
                 }
             }.runTaskLater(plugin, 8 * 20L);
         }
@@ -106,11 +104,11 @@ public class FFAListener implements Listener {
                 e.setCancelled(true);
                 MessageUtil.sendActionBar(player, "&cYou cannot break blocks here!");
             }
-            if (!blockplaced.contains(e.getBlock().getLocation())) {
+            if (!TempData.getBlockPlaced().contains(e.getBlock().getLocation())) {
                 e.setCancelled(true);
                 MessageUtil.sendActionBar(player, "&cYou cannot break this block!");
             }
-            blockplaced.remove(e.getBlock().getLocation());
+            TempData.getBlockPlaced().remove(e.getBlock().getLocation());
         }
     }
 }

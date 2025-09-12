@@ -1,13 +1,17 @@
 package me.itsglobally.circlePractice.data;
 
+import org.bukkit.Location;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class TempData {
     private static final HashMap<UUID, UUID> lastHit = new HashMap<>();
     private static final HashMap<UUID, Long> ks = new HashMap<>();
     private static final HashMap<UUID, Boolean> build = new HashMap<>();
-
+    private static final List<Location> blockplaced = new ArrayList<>();
     public static UUID getLastHit(UUID vic) {
         return lastHit.getOrDefault(vic, null);
     }
@@ -35,4 +39,9 @@ public class TempData {
     public static void toggleBuild(UUID vic) {
         build.put(vic, !getBuild(vic));
     }
+
+    public static void addBlockPlaced(Location l) { blockplaced.add(l); }
+    public static void removeBlockPlaced(Location l) { blockplaced.remove(l); }
+    public static List<Location> getBlockPlaced() { return  blockplaced; }
+
 }

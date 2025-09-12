@@ -4,6 +4,7 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.Duel;
 import me.itsglobally.circlePractice.data.Kit;
 import me.itsglobally.circlePractice.data.PracticePlayer;
+import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +29,6 @@ public class DuelListener implements Listener {
 
     private final CirclePractice plugin = CirclePractice.getInstance();
 
-    public List<Location> blockplaced = new ArrayList<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageEvent event) {
@@ -80,7 +80,7 @@ public class DuelListener implements Listener {
         }
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         PracticePlayer practicePlayer = plugin.getPlayerManager().getPlayer(player);
@@ -89,7 +89,7 @@ public class DuelListener implements Listener {
             // Set respawn location to spawn
             // This will be handled by the SpawnCommand teleportToSpawn method
         }
-    }
+    }*/
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
@@ -121,7 +121,7 @@ public class DuelListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            blockplaced.add(e.getBlockPlaced().getLocation());
+            TempData.addBlockPlaced(e.getBlockPlaced().getLocation());
         }
     }
 
@@ -141,11 +141,13 @@ public class DuelListener implements Listener {
                 MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
                 return;
             }
-            if (!blockplaced.contains(e.getBlock().getLocation())) {
+            if (!TempData.getBlockPlaced().contains(e.getBlock().getLocation())) {
                 e.setCancelled(true);
                 MessageUtil.sendActionBar(player, "&cYou can only place blocks that placed by player!");
+                return;
             }
         }
+        TempData.removeBlockPlaced(e.getBlock().getLocation());
     }
 
 
