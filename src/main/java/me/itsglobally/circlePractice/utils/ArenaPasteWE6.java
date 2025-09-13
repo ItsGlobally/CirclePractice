@@ -18,7 +18,7 @@ public class ArenaPasteWE6 {
                                         int x, int y, int z, int xoffset, int zoffset,
                                         boolean pasteAir) throws Exception {
 
-        File schematicFile = new File("plugins/WorldEdit/schematics", schematicName + ".schematic");
+        File schematicFile = new File(schematicName);
 
         if (!schematicFile.exists()) {
             throw new IllegalArgumentException("Schematic file not found: " + schematicFile.getAbsolutePath());

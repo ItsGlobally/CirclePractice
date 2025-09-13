@@ -138,8 +138,8 @@ public class ArenaManager {
         }
 
         Location spectator = new Location(world, originX, y + 10, originZ);
-        Location player1Spawn = new Location(world, originX + 25, y + 1, originZ);
-        Location player2Spawn = new Location(world, originX - 25, y + 1, originZ);
+        Location player1Spawn = new Location(world, originX + 23, y + 1, originZ, 90, 0);
+        Location player2Spawn = new Location(world, originX - 23, y + 1, originZ, -90, 0);
 
         Bukkit.broadcastMessage("P1 Spawn: " + player1Spawn);
         Bukkit.broadcastMessage("P2 Spawn: " + player2Spawn);
