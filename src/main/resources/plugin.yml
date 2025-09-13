@@ -5,7 +5,8 @@ api-version: 1.8
 authors: [ItsGlobally, bolt.new]
 description: Advanced PvP Practice Plugin
 depend: [ NontageLib, Vault ]
-
+softdepend:
+  - "PlaceholderAPI"
 commands:
   duel:
     description: Send a duel request to a player

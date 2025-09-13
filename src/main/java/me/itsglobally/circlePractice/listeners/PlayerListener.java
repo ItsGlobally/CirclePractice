@@ -4,12 +4,17 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import top.nontage.nontagelib.annotations.AutoListener;
 
 @AutoListener
@@ -21,6 +26,11 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        if (player.hasPermission("circlepractice.fly")) {
+            player.setAllowFlight(true);
+            player.setFlying(true);
+        }
+        plugin.getConfigManager().teleportToSpawn(player);
         plugin.getPlayerManager().addPlayer(player);
         MessageUtil.sendTitle(player, "&cThis server is still in DEVELOPMENT!", "&aFeel free to report any bugs!");
     }
@@ -55,6 +65,35 @@ public class PlayerListener implements Listener {
                         + "&r » "
                         + e.getMessage()
         )); // [RETARDED] Wilson_TW_awa » I AM GAY
+    }
+    @EventHandler
+    public void onHungry(FoodLevelChangeEvent e) {
+        if (!(e.getEntity() instanceof Player p)) {
+            return;
+        }
+        PracticePlayer pp = plugin.getPlayerManager().getPlayer(p.getUniqueId());
+        if (!pp.isInDuel()) {
+            e.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent e){
+        PracticePlayer pp = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
+        if (pp.getState() != PracticePlayer.PlayerState.DUEL && pp.getState() != PracticePlayer.PlayerState.FFA) e.setCancelled(true);
+    }
+    @EventHandler
+    public void onPotionDrink(PlayerItemConsumeEvent event) {
+        ItemStack item = event.getItem();
+
+        if (item.getType() == Material.POTION) {
+            event.getPlayer().getServer().getScheduler().runTaskLater(
+                   plugin,
+                    () -> {
+                        event.getPlayer().getInventory().removeItem(new ItemStack(Material.GLASS_BOTTLE, 1));
+                    },
+                    1L
+            );
+        }
     }
 
 }

@@ -100,6 +100,10 @@ public class DuelManager {
     }
 
     public void startDuel(Player player1, Player player2, String kit) {
+        player1.setAllowFlight(false);
+        player2.setAllowFlight(false);
+        player1.setFlying(false);
+        player2.setFlying(false);
         PracticePlayer pp1 = plugin.getPlayerManager().getPlayer(player1);
         PracticePlayer pp2 = plugin.getPlayerManager().getPlayer(player2);
         // Check if players are available

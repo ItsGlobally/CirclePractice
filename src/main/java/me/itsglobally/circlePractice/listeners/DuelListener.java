@@ -29,6 +29,8 @@ public class DuelListener implements Listener {
     public void onEntityDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) event.setCancelled(true);
+
         PracticePlayer practicePlayer = plugin.getPlayerManager().getPlayer(player);
 
         if (practicePlayer != null && practicePlayer.isInDuel()) {
@@ -90,9 +92,15 @@ public class DuelListener implements Listener {
     public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
         PracticePlayer pp = plugin.getPlayerManager().getPlayer(p.getUniqueId());
-        if (pp.isInDuel() && plugin.getDuelManager().getDuel(p.getUniqueId()).getState() == Duel.DuelState.STARTING)
-            e.setCancelled(true);
+
+        if (pp.isInDuel() && plugin.getDuelManager().getDuel(p.getUniqueId()).getState() == Duel.DuelState.STARTING) {
+            if (e.getFrom().getBlockX() != e.getTo().getBlockX() ||
+                    e.getFrom().getBlockZ() != e.getTo().getBlockZ()) {
+                e.setCancelled(true);
+            }
+        }
     }
+
 
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {

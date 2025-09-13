@@ -58,34 +58,33 @@ public class KitManager {
         if (!kits.containsKey("NoDebuff")) {
             Kit noDebuff = new Kit("NoDebuff");
 
-            // Inventory contents
             ItemStack[] contents = new ItemStack[36];
-            // Sword in slot 0
             contents[0] = new ItemBuilder(Material.DIAMOND_SWORD)
-                    .addEnchantment(org.bukkit.enchantments.Enchantment.DAMAGE_ALL, 3) // Sharp 3
-                    .addEnchantment(org.bukkit.enchantments.Enchantment.DURABILITY, 3)  // Unbreaking 3
+                    .addEnchantment(Enchantment.DAMAGE_ALL, 3)
+                    .addEnchantment(Enchantment.DURABILITY, 3)
+                    .addEnchantment(Enchantment.FIRE_ASPECT, 2)
                     .setUnbreakable(true)
                     .build();
 
-            // Slots 1 → instant health potion
-            contents[1] = new ItemBuilder(Material.POTION)
-                    .setDurability((short) 16421) // Instant Health II
-                    .build();
+            contents[1] = new ItemStack(Material.COOKED_BEEF, 64);
 
-            // Slots 2 → Speed potion
             contents[2] = new ItemBuilder(Material.POTION)
-                    .setDurability((short) 8194) // Speed II
+                    .setDurability((short) 8194)
                     .build();
 
-            // Slots 3 → Fire Resistance potion
+
             contents[3] = new ItemBuilder(Material.POTION)
-                    .setDurability((short) 8195) // Fire Resistance
+                    .setDurability((short) 8195)
                     .build();
 
-            // Remaining slots → instant health potion
-            for (int i = 4; i < 36; i++) {
+            for (int i = 4; i < 32; i++) {
                 contents[i] = new ItemBuilder(Material.POTION)
                         .setDurability((short) 16421)
+                        .build();
+            }
+            for (int i = 33; i < 36; i++) {
+                contents[i] = new ItemBuilder(Material.POTION)
+                        .setDurability((short) 8194)
                         .build();
             }
 

@@ -32,7 +32,7 @@ public class ArenaManager {
         this.rand = new Random();
         this.schematicPaths = new ArrayList<>();
         this.kitToSchematics = new HashMap<>();
-        this.world = Bukkit.getWorld("ffa");
+        this.world = Bukkit.getWorld("practice");
         loadArenas();
     }
 
@@ -94,34 +94,20 @@ public class ArenaManager {
             }
         }
 
-        createArena(kit);
-
-        List<Arena> freeArenasAfterCreate = arenas.values().stream()
-                .filter(arena -> !arena.isInUse() && arena.isComplete())
-                .toList();
-
-        if (!freeArenasAfterCreate.isEmpty()) {
-            Arena chosen = freeArenasAfterCreate.get(rand.nextInt(freeArenasAfterCreate.size()));
-            if (chosen.getKits().contains(kit)) {
-                chosen.setInUse(true);
-                return chosen;
-            }
-        }
-
-        return null;
+        return createArena(kit);
     }
 
-    private void createArena(String kit) {
+    private Arena createArena(String kit) {
         List<String> matchingSchematics = kitToSchematics.getOrDefault(kit.toLowerCase(), Collections.emptyList());
         if (matchingSchematics.isEmpty()) {
             Bukkit.getLogger().warning("No schematics found for kit: " + kit);
-            return;
+            return null;
         }
         String chosenPath = matchingSchematics.get(rand.nextInt(matchingSchematics.size()));
 
 
-        int xIndex = rand.nextInt(gridMax - gridMin + 1) + gridMin;
-        int zIndex = rand.nextInt(gridMax - gridMin + 1) + gridMin;
+        int xIndex = rand.nextInt(gridMax - gridMin + 2) + gridMin;
+        int zIndex = rand.nextInt(gridMax - gridMin + 2) + gridMin;
 
         int originX = xIndex * arenaSize;
         int originZ = zIndex * arenaSize;
@@ -149,7 +135,7 @@ public class ArenaManager {
         arena.setPos1(player1Spawn);
         arena.setPos2(player2Spawn);
         arena.setSpectatorSpawn(spectator);
-        arena.setInUse(true);
+        arena.setInUse(false);
 
 
         String baseName = new File(chosenPath).getName().replaceFirst("[.][^.]+$", "");
@@ -159,6 +145,8 @@ public class ArenaManager {
         }
 
         arenas.put(arenaName, arena);
+
+        return arena;
     }
 
     public Map<String, Arena> getAllArenas() {

@@ -93,7 +93,7 @@ public class ConfigManager {
     public void teleportToSpawn(Player player) {
         String world = config.getString("spawn.world", "world");
         double x = config.getDouble("spawn.x", 0.5);
-        double y = config.getDouble("spawn.y", 100);
+        double y = config.getDouble("spawn.y", 50);
         double z = config.getDouble("spawn.z", 0.5);
         float yaw = (float) config.getDouble("spawn.yaw", 0);
         float pitch = (float) config.getDouble("spawn.pitch", 0);

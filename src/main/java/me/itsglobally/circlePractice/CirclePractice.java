@@ -7,6 +7,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.nontage.nontagelib.command.NontageCommandLoader;
@@ -55,7 +56,10 @@ public class CirclePractice extends JavaPlugin {
         instance = this;
 
         initManagers();
-
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) { //
+            new phapi().register(); //
+            getLogger().info("register");
+        } else getLogger().info("no papi");
         NontageCommandLoader.registerAll(this);
         ListenerRegister.registerAll(this);
         getLogger().info("CirclePractice has been enabled!");
