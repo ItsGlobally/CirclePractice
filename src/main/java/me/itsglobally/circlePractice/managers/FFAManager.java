@@ -31,12 +31,14 @@ public record FFAManager(CirclePractice plugin) {
         pp.setState(PracticePlayer.PlayerState.FFA);
         plugin.getConfigManager().teleportToSpawn(p);
         pp.restoreInventory(p);
+        plugin.getConfigManager().teleportToSpawn(p);
     }
 
     public void spawn(Player p) {
         PracticePlayer pp = plugin.getPlayerManager().getPlayer(p.getUniqueId());
         pp.saveInventory(p);
         plugin.getKitManager().applyKit(p, "FFA");
+        plugin.getConfigManager().teleportToFFASpawn(p);
 
     }
 

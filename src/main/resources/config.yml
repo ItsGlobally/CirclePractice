@@ -2,13 +2,21 @@
 
 # Default spawn location
 spawn:
-  world: ffa
+  world: practice
   x: 0.5
   y: 50.0
   z: 0.5
   yaw: 0.0
   pitch: 0.0
-
+ffa:
+  - 1:
+    spawn:
+    world: practice
+    x: -1000
+    y: 100
+    z: 1000
+    yaw: 0.0
+    pitch: 0.0
 # Plugin settings
 settings:
   # Time (in seconds) players wait in the queue before starting a duel

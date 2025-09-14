@@ -12,6 +12,7 @@ public class TempData {
     private static final HashMap<UUID, Long> ks = new HashMap<>();
     private static final HashMap<UUID, Boolean> build = new HashMap<>();
     private static final List<Location> blockplaced = new ArrayList<>();
+    private static final List<Location> FFAMaps = new ArrayList<>();
 
     public static UUID getLastHit(UUID vic) {
         return lastHit.getOrDefault(vic, null);
@@ -51,6 +52,15 @@ public class TempData {
 
     public static List<Location> getBlockPlaced() {
         return blockplaced;
+    }
+
+    public static void addFFAMap(Location l) {
+        FFAMaps.add(l);
+    }
+
+
+    public static List<Location> getFFAMaps() {
+        return FFAMaps;
     }
 
 }
