@@ -24,16 +24,6 @@ public class FFAListener implements Listener {
 
 
     @EventHandler
-    public void onBlockPlace(BlockPlaceEvent e) {
-
-    }
-
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent e) {
-
-    }
-
-    @EventHandler
     public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);

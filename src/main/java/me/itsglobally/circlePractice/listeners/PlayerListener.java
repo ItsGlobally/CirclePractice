@@ -82,13 +82,23 @@ public class PlayerListener implements Listener {
     }
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e){
-        PracticePlayer pp = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
-        if (pp.getState() != PracticePlayer.PlayerState.DUEL && pp.getState() != PracticePlayer.PlayerState.FFA) e.setCancelled(true);
+        PracticePlayer pP = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
+        if (pP.getState() == PracticePlayer.PlayerState.SPAWN || pP.isInFFA()) {
+            if (TempData.getBuild(e.getPlayer().getUniqueId())) {
+                return;
+            }
+            e.setCancelled(true);
+        }
     }
     @EventHandler
     public void onBlockPlaced(BlockPlaceEvent e){
-        PracticePlayer pp = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
-        if (pp.getState() != PracticePlayer.PlayerState.DUEL && pp.getState() != PracticePlayer.PlayerState.FFA) e.setCancelled(true);
+        PracticePlayer pP = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
+        if (pP.getState() == PracticePlayer.PlayerState.SPAWN || pP.isInFFA()) {
+            if (TempData.getBuild(e.getPlayer().getUniqueId())) {
+                return;
+            }
+            e.setCancelled(true);
+        }
     }
     @EventHandler
     public void onPotionDrink(PlayerItemConsumeEvent event) {
