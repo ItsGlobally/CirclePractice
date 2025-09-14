@@ -60,7 +60,6 @@ public class EconomyManager {
         return plugin.getFileDataManager().removeCoins(uuid, amount);
     }
 
-    // Vault integration methods
     public double getBalance(Player player) {
         if (vaultEnabled) {
             return economy.getBalance(player);
@@ -124,4 +123,4 @@ public class EconomyManager {
             addCoins(player.getUniqueId(), reward);
         }
     }
-}
+} // what i mean how tf do u get my ip

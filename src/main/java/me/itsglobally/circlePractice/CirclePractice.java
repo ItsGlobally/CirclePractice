@@ -1,6 +1,7 @@
 package me.itsglobally.circlePractice;
 
 import me.itsglobally.circlePractice.data.FileDataManager;
+import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.managers.*;
 import me.itsglobally.circlePractice.utils.ConfigManager;
 import net.kyori.adventure.audience.Audience;
@@ -85,6 +86,7 @@ public class CirclePractice extends JavaPlugin {
         pluginManager = new PluginManager(this);
         economyManager = new EconomyManager(this);
         scoreboardStatus = new ScoreboardStatus(this);
+        TempData.setFfaCurrentSpawn(ffaManager.randomSpawn());
     }
 
     @Override

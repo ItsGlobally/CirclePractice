@@ -227,9 +227,12 @@ public class DuelManager {
             if (p1 != null) MessageUtil.sendMessage(p1, message);
             if (p2 != null) MessageUtil.sendMessage(p2, message);
 
+
             Player winnerPlayer = Bukkit.getPlayer(winner.getUuid());
             if (winnerPlayer != null) {
                 plugin.getEconomyManager().rewardWin(winnerPlayer, duel.getKit());
+                plugin.getFileDataManager().addXp(winnerPlayer.getUniqueId(), 10);
+                MessageUtil.sendMessage(winnerPlayer, "You won &d10 xp &rfrom the duel");
             }
             plugin.getFileDataManager().updatePlayerStats(winner.getUuid(), duel.getKit(), true);
             plugin.getFileDataManager().updatePlayerStats(duel.getOpponent(winner).getUuid(), duel.getKit(), false);

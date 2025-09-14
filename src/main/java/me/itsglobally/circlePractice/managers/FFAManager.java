@@ -5,8 +5,12 @@ import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+
+import java.util.List;
+import java.util.Random;
 
 public record FFAManager(CirclePractice plugin) {
 
@@ -35,10 +39,14 @@ public record FFAManager(CirclePractice plugin) {
     }
 
     public void spawn(Player p) {
+        try {
+            teleportToFFASpawn(p);
+        } catch (IllegalStateException e) {
+            return;
+        }
         PracticePlayer pp = plugin.getPlayerManager().getPlayer(p.getUniqueId());
         pp.saveInventory(p);
         plugin.getKitManager().applyKit(p, "FFA");
-        plugin.getConfigManager().teleportToFFASpawn(p);
 
     }
 
@@ -60,12 +68,13 @@ public record FFAManager(CirclePractice plugin) {
 
         plugin.getEconomyManager().rewardKill(klr);
 
-        MessageUtil.sendActionBar(klr, plugin.getPlayerManager().getPrefix(klr) + klr.getName() + "&rhas killed " + plugin.getPlayerManager().getPrefix(vic) + vic.getName() + "&r!");
-
+        MessageUtil.sendActionBar(klr, plugin.getPlayerManager().getPrefix(klr) + klr.getName() + "&rhas killed " + plugin.getPlayerManager().getPrefix(vic) + vic.getName() + "&r! (+&d10&r xp)");
+        plugin.getFileDataManager().addXp(klr.getUniqueId(), 10);
         klr.setHealth(20.0);
 
         klr.playSound(klr.getLocation(), Sound.ORB_PICKUP, 1.0f, 1.0f);
 
+        plugin.getEconomyManager().addCoins(klr.getUniqueId(), TempData.getKs(klr.getUniqueId()) * 10);
 
         if (vic != null) {
             vic.playSound(vic.getLocation(), Sound.ORB_PICKUP, 1.0f, 1.0f);
@@ -74,7 +83,7 @@ public record FFAManager(CirclePractice plugin) {
 
         long streak = TempData.getKs(klr.getUniqueId());
         if (streak >= 10 && streak % 5 == 0) {
-            // Reward killstreak bonus
+
             plugin.getEconomyManager().rewardKillstreak(klr, streak);
 
             for (Player op : Bukkit.getOnlinePlayers()) {
@@ -83,6 +92,16 @@ public record FFAManager(CirclePractice plugin) {
             Bukkit.broadcastMessage(plugin.getPlayerManager().getPrefix(klr) + klr.getName() + " §ahas reached " + streak + " §akillstreaks!");
         }
 
+    }
+    public Location randomSpawn() throws IllegalStateException {
+        List<Location> spawns = plugin.getConfigManager().getFFASpawns();
+        if (spawns.isEmpty()) {
+            throw new IllegalStateException("No FFA spawns");
+        }
+        return spawns.get(new Random().nextInt(spawns.size()));
+    }
+    public void teleportToFFASpawn(Player p) throws IllegalStateException {
+            p.teleport(TempData.getFfaCurrentSpawn());
     }
 
 }

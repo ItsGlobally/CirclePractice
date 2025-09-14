@@ -44,7 +44,6 @@ public class QueueManager {
         practicePlayer.setQueueStartTime(System.currentTimeMillis());
 
         MessageUtil.sendMessage(player, "&aYou joined the &e" + kit + " &aqueue!");
-        updateQueueInfo(player, kit);
     }
 
     public void leaveQueue(Player player) {
@@ -95,21 +94,8 @@ public class QueueManager {
                         }
                     }
 
-                    // Update queue info for remaining players
-                    for (PracticePlayer pp : queue) {
-                        Player p = Bukkit.getPlayer(pp.getUuid());
-                        if (p != null && p.isOnline()) {
-                            updateQueueInfo(p, kit);
-                        }
-                    }
                 }
             }
         }.runTaskTimer(plugin, 0L, 20L); // Run every second
-    }
-
-    private void updateQueueInfo(Player player, String kit) {
-        Queue<PracticePlayer> queue = queues.get(kit);
-        if (queue == null) {
-        }
     }
 }

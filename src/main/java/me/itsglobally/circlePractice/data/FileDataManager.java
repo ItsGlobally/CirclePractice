@@ -13,7 +13,6 @@ import java.util.UUID;
 public class FileDataManager {
 
     private final CirclePractice plugin;
-    // cache system
     private final Map<UUID, CachedPlayerData> cache = new HashMap<>();
     private FileConfiguration playerData;
     private File playerDataFile;
@@ -50,7 +49,7 @@ public class FileDataManager {
 
         CachedPlayerData data = new CachedPlayerData(uuid, name);
 
-        // Load duel stats
+        // Duel stats
         if (playerData.contains(path + ".stats")) {
             for (String kit : playerData.getConfigurationSection(path + ".stats").getKeys(false)) {
                 int wins = playerData.getInt(path + ".stats." + kit + ".wins", 0);
@@ -59,25 +58,30 @@ public class FileDataManager {
             }
         }
 
-        // Load kits
+        // Kits
         if (playerData.contains(path + ".kits")) {
             for (String kit : playerData.getConfigurationSection(path + ".kits").getKeys(false)) {
                 data.getKits().put(kit, playerData.getString(path + ".kits." + kit));
             }
         }
 
-        // Load FFA stats
+        // FFA
         if (playerData.contains(path + ".ffa")) {
             int kills = playerData.getInt(path + ".ffa.kills", 0);
             int deaths = playerData.getInt(path + ".ffa.deaths", 0);
             data.setFfaStats(new FfaStats(kills, deaths));
         }
 
-        // Load coins
-        if (playerData.contains(path + ".coins")) {
-            long coins = playerData.getLong(path + ".coins", 0);
-            data.setCoins(coins);
+        // Load stars
+        if (playerData.contains(path + ".stars")) {
+            data.setStars(playerData.getLong(path + ".stars", 1));
         }
+
+// Load xp
+        if (playerData.contains(path + ".xp")) {
+            data.setXp(playerData.getLong(path + ".xp", 0));
+        }
+
 
         return data;
     }
@@ -91,25 +95,27 @@ public class FileDataManager {
         playerData.set(path + ".first-join", data.getFirstJoin());
         playerData.set(path + ".last-seen", System.currentTimeMillis());
 
-        // Save duel stats
+        // Duel stats
         for (Map.Entry<String, PlayerStats> entry : data.getStats().entrySet()) {
             String kitPath = path + ".stats." + entry.getKey();
             playerData.set(kitPath + ".wins", entry.getValue().wins());
             playerData.set(kitPath + ".losses", entry.getValue().losses());
         }
 
-        // Save kits
+        // Kits
         for (Map.Entry<String, String> entry : data.getKits().entrySet()) {
             playerData.set(path + ".kits." + entry.getKey(), entry.getValue());
         }
 
-        // Save FFA stats
+        // FFA
         FfaStats ffa = data.getFfaStats();
         playerData.set(path + ".ffa.kills", ffa.kills());
         playerData.set(path + ".ffa.deaths", ffa.deaths());
 
-        // Save coins
-        playerData.set(path + ".coins", data.getCoins());
+
+        playerData.set(path + ".stars", data.getStars());
+
+        playerData.set(path + ".xp", data.getXp());
 
         savePlayerDataFile();
     }
@@ -175,28 +181,68 @@ public class FileDataManager {
         return getCachedData(uuid).getFfaStats();
     }
 
-    // --- Coins API ---
+    // --- Stars API ---
 
-    public long getCoins(UUID uuid) {
-        return getCachedData(uuid).getCoins();
+    public long getStars(UUID uuid) {
+        return getCachedData(uuid).getStars();
     }
 
-    public void setCoins(UUID uuid, long coins) {
-        getCachedData(uuid).setCoins(coins);
+    public void setStars(UUID uuid, long stars) {
+        getCachedData(uuid).setStars(stars);
     }
 
-    public void addCoins(UUID uuid, long coins) {
+    public void addStars(UUID uuid, long stars) {
         CachedPlayerData data = getCachedData(uuid);
-        data.setCoins(data.getCoins() + coins);
+        data.setStars(data.getStars() + stars);
     }
 
-    public boolean removeCoins(UUID uuid, long coins) {
+    public boolean removeStars(UUID uuid, long stars) {
         CachedPlayerData data = getCachedData(uuid);
-        if (data.getCoins() >= coins) {
-            data.setCoins(data.getCoins() - coins);
+        if (data.getStars() >= stars) {
+            data.setStars(data.getStars() - stars);
             return true;
         }
         return false;
+    }
+    public long getXp(UUID uuid) {
+        return getCachedData(uuid).getXp();
+    }
+
+    public void setXp(UUID uuid, long xp) {
+        CachedPlayerData data = getCachedData(uuid);
+        data.setXp(xp);
+        checkStarUpgrade(data);
+    }
+
+    public void addXp(UUID uuid, long xp) {
+        CachedPlayerData data = getCachedData(uuid);
+        data.setXp(data.getXp() + xp);
+        checkStarUpgrade(data);
+    }
+
+    private void checkStarUpgrade(CachedPlayerData data) {
+        while (data.getXp() >= 100) {
+            data.setXp(data.getXp() - 100);
+            data.setStars(data.getStars() + 1);
+        }
+    }
+
+    // --- Coins API (Delegated to EconomyManager) ---
+
+    public long getCoins(UUID uuid) {
+        return plugin.getEconomyManager().getCoins(uuid);
+    }
+
+    public void setCoins(UUID uuid, long coins) {
+        plugin.getEconomyManager().setCoins(uuid, coins);
+    }
+
+    public void addCoins(UUID uuid, long coins) {
+        plugin.getEconomyManager().addCoins(uuid, coins);
+    }
+
+    public boolean removeCoins(UUID uuid, long coins) {
+        return plugin.getEconomyManager().removeCoins(uuid, coins);
     }
 
     private void savePlayerDataFile() {
@@ -242,66 +288,33 @@ public class FileDataManager {
         private String name;
         private long firstJoin;
         private long lastSeen;
-        // NEW: FFA stats
         private FfaStats ffaStats = new FfaStats();
-        // NEW: Coins
-        private long coins = 0;
+
+        private long stars = 1;
+        private long xp = 0;
 
         public CachedPlayerData(UUID uuid, String name) {
             this.uuid = uuid;
             this.name = name;
         }
 
-        public UUID getUuid() {
-            return uuid;
-        }
+        public UUID getUuid() { return uuid; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public long getFirstJoin() { return firstJoin; }
+        public void setFirstJoin(long firstJoin) { this.firstJoin = firstJoin; }
+        public long getLastSeen() { return lastSeen; }
+        public void setLastSeen(long lastSeen) { this.lastSeen = lastSeen; }
+        public Map<String, PlayerStats> getStats() { return stats; }
+        public Map<String, String> getKits() { return kits; }
+        public FfaStats getFfaStats() { return ffaStats; }
+        public void setFfaStats(FfaStats ffaStats) { this.ffaStats = ffaStats; }
 
-        public String getName() {
-            return name;
-        }
+        public long getStars() { return stars; }
+        public void setStars(long stars) { this.stars = stars; }
 
-        public void setName(String name) {
-            this.name = name;
-        }
+        public long getXp() { return xp; }
+        public void setXp(long xp) { this.xp = xp; }
 
-        public long getFirstJoin() {
-            return firstJoin;
-        }
-
-        public void setFirstJoin(long firstJoin) {
-            this.firstJoin = firstJoin;
-        }
-
-        public long getLastSeen() {
-            return lastSeen;
-        }
-
-        public void setLastSeen(long lastSeen) {
-            this.lastSeen = lastSeen;
-        }
-
-        public Map<String, PlayerStats> getStats() {
-            return stats;
-        }
-
-        public Map<String, String> getKits() {
-            return kits;
-        }
-
-        public FfaStats getFfaStats() {
-            return ffaStats;
-        }
-
-        public void setFfaStats(FfaStats ffaStats) {
-            this.ffaStats = ffaStats;
-        }
-
-        public long getCoins() {
-            return coins;
-        }
-
-        public void setCoins(long coins) {
-            this.coins = coins;
-        }
     }
 }

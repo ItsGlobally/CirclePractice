@@ -130,15 +130,7 @@ public class ConfigManager {
         return spawns;
     }
 
-    public void teleportToFFASpawn(Player p) {
-        List<Location> spawns = getFFASpawns();
-        if (spawns.isEmpty()) {
-            p.sendMessage("§cNo FFA spawns are configured.");
-            return;
-        }
-        Location randomSpawn = spawns.get(random.nextInt(spawns.size()));
-        p.teleport(randomSpawn);
-    }
+
 
     public void teleportToSpawn(Player player) {
         String world = config.getString("spawn.world", "world");

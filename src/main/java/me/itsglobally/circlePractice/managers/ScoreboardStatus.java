@@ -33,7 +33,7 @@ public record ScoreboardStatus(CirclePractice plugin) {
             }
             case 3 -> {
                 if (ps == PracticePlayer.PlayerState.SPAWN) {
-                    return "Coins: &d" + plugin.getFileDataManager().getCoins(p.getUniqueId());
+                    return "Coins: &d" + plugin.getEconomyManager().getBalance(p);
                 }
                 if (ps == PracticePlayer.PlayerState.FFA) {
                     return "K/D: " + plugin.getFileDataManager().getFfaStats(p.getUniqueId()).getKDR();
@@ -63,7 +63,7 @@ itsglobally.top
 /*
 Circle Network
 
-Your opp: Gayson_TW_awa1
+Your opp: Gayson_TW_awa 1
 Your ping: -1ms 2
 Their ping: -2ms 3
 4
