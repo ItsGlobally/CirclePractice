@@ -58,7 +58,6 @@ public record FFAManager(CirclePractice plugin) {
         plugin.getFileDataManager().updateFfaStats(klr.getUniqueId(), 1, 0);
         plugin.getFileDataManager().updateFfaStats(vic.getUniqueId(), 0, 1);
 
-        // Reward coins for kill
         plugin.getEconomyManager().rewardKill(klr);
 
         MessageUtil.sendActionBar(klr, plugin.getPlayerManager().getPrefix(klr) + klr.getName() + "&rhas killed " + plugin.getPlayerManager().getPrefix(vic) + vic.getName() + "&r!");

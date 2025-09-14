@@ -2,6 +2,7 @@ package me.itsglobally.circlePractice.listeners;
 
 import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.PracticePlayer;
+import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -41,15 +43,17 @@ public class PlayerListener implements Listener {
         PracticePlayer practicePlayer = plugin.getPlayerManager().getPlayer(player);
 
         if (practicePlayer != null) {
-            // Handle leaving queue
+
             if (practicePlayer.isInQueue()) {
                 plugin.getQueueManager().leaveQueue(player);
             }
 
-            // Handle leaving duel
             if (practicePlayer.isInDuel()) {
                 plugin.getDuelManager().endDuel(practicePlayer.getCurrentDuel(),
                         practicePlayer.getCurrentDuel().getOpponent(practicePlayer));
+            }
+            if (practicePlayer.isInFFA()) {
+                plugin.getFFAManager().kill(player, Bukkit.getPlayer(TempData.getLastHit(player.getUniqueId())));
             }
         }
 
@@ -64,7 +68,7 @@ public class PlayerListener implements Listener {
                 plugin.getPlayerManager().getPrefixedName(e.getPlayer())
                         + "&r » "
                         + e.getMessage()
-        )); // [RETARDED] Wilson_TW_awa » I AM GAY
+        ));
     }
     @EventHandler
     public void onHungry(FoodLevelChangeEvent e) {
@@ -78,6 +82,11 @@ public class PlayerListener implements Listener {
     }
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e){
+        PracticePlayer pp = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
+        if (pp.getState() != PracticePlayer.PlayerState.DUEL && pp.getState() != PracticePlayer.PlayerState.FFA) e.setCancelled(true);
+    }
+    @EventHandler
+    public void onBlockPlaced(BlockPlaceEvent e){
         PracticePlayer pp = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
         if (pp.getState() != PracticePlayer.PlayerState.DUEL && pp.getState() != PracticePlayer.PlayerState.FFA) e.setCancelled(true);
     }

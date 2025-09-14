@@ -164,8 +164,13 @@ public class DuelManager {
                 p1.playSound(p1.getLocation(), Sound.CLICK, 1.0f, 1.0f);
                 p2.playSound(p2.getLocation(), Sound.CLICK, 1.0f, 1.0f);
 
-                if (p1 == null || p2 == null) {
-                    endDuel(duel, null);
+                if (p1 == null) {
+                    endDuel(duel, duel.getOpponent(plugin.getPlayerManager().getPlayer(p2.getUniqueId())));
+                    cancel();
+                    return;
+                }
+                if (p2 == null) {
+                    endDuel(duel, duel.getOpponent(plugin.getPlayerManager().getPlayer(p1.getUniqueId())));
                     cancel();
                     return;
                 }
@@ -193,16 +198,13 @@ public class DuelManager {
         Player p1 = Bukkit.getPlayer(duel.getPlayer1().getUuid());
         Player p2 = Bukkit.getPlayer(duel.getPlayer2().getUuid());
 
-        // Reset player states
         duel.getPlayer1().setState(PracticePlayer.PlayerState.SPAWN);
         duel.getPlayer2().setState(PracticePlayer.PlayerState.SPAWN);
         duel.getPlayer1().setCurrentDuel(null);
         duel.getPlayer2().setCurrentDuel(null);
 
-        // Free arena
         duel.getArena().setInUse(false);
 
-        // Teleport to spawn and restore inventories
         if (p1 != null) {
             plugin.getConfigManager().teleportToSpawn(p1);
             duel.getPlayer1().restoreInventory(p1);
@@ -218,28 +220,21 @@ public class DuelManager {
             }
         }
 
-        // Announce winner
         if (winner != null) {
             String winnerName = winner.getName();
             String loserName = duel.getOpponent(winner).getName();
+            String message = "&f-------------------------\n&bWinner: &f" + winnerName + "&r | &cLoser: &f" + loserName + "&r\n&f-------------------------";
+            if (p1 != null) MessageUtil.sendMessage(p1, message);
+            if (p2 != null) MessageUtil.sendMessage(p2, message);
 
-            if (p1 != null) MessageUtil.sendMessage(p1, "&e" + winnerName + " &awon the duel!");
-            if (p2 != null) MessageUtil.sendMessage(p2, "&e" + winnerName + " &awon the duel!");
-
-            // Update stats in file storage
-            boolean p1Won = winner.equals(duel.getPlayer1());
-
-            // Reward coins for winning
             Player winnerPlayer = Bukkit.getPlayer(winner.getUuid());
             if (winnerPlayer != null) {
                 plugin.getEconomyManager().rewardWin(winnerPlayer, duel.getKit());
             }
-
             plugin.getFileDataManager().updatePlayerStats(winner.getUuid(), duel.getKit(), true);
             plugin.getFileDataManager().updatePlayerStats(duel.getOpponent(winner).getUuid(), duel.getKit(), false);
         }
 
-        // Remove duel
         duels.remove(duel.getId());
     }
 

@@ -25,9 +25,10 @@ public class phapi extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         return switch (params) {
-            case "sb1" -> MessageUtil.formatMessage("&fYour ping: 0ms");
-            case "sb2" -> MessageUtil.formatMessage("&fOnline players: 1");
-            case "sb3" -> MessageUtil.formatMessage("&7itsglobally.top");
+            case "sb1" -> MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 1));
+            case "sb2" -> MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 2));
+            case "sb3" -> MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 3));
+            case "sb4" -> MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 4));
             default -> "";
         };
     }

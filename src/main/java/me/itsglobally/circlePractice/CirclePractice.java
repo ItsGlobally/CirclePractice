@@ -29,6 +29,7 @@ public class CirclePractice extends JavaPlugin {
     private FFAManager ffaManager;
     private PluginManager pluginManager;
     private EconomyManager economyManager;
+    private ScoreboardStatus scoreboardStatus;
 
     public static CirclePractice getInstance() {
         return instance;
@@ -83,6 +84,7 @@ public class CirclePractice extends JavaPlugin {
         ffaManager = new FFAManager(this);
         pluginManager = new PluginManager(this);
         economyManager = new EconomyManager(this);
+        scoreboardStatus = new ScoreboardStatus(this);
     }
 
     @Override
@@ -129,6 +131,9 @@ public class CirclePractice extends JavaPlugin {
 
     public EconomyManager getEconomyManager() {
         return economyManager;
+    }
+    public ScoreboardStatus getScoreboardStatus() {
+        return scoreboardStatus;
     }
 
     public LuckPerms getLuckPerms() {
