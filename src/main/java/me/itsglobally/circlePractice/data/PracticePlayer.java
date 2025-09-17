@@ -20,12 +20,14 @@ public class PracticePlayer {
     private long queueStartTime;
     private ItemStack[] previousInventory;
     private ItemStack[] previousArmor;
+    private Player player;
 
     public PracticePlayer(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
         this.state = PlayerState.SPAWN;
         this.kitContents = new HashMap<>();
+        this.player = Bukkit.getPlayer(uuid);
     }
 
     public UUID getUuid() {
@@ -84,12 +86,12 @@ public class PracticePlayer {
         return state == PlayerState.SPECTATING;
     }
 
-    public void saveInventory(Player player) {
+    public void saveInventory() {
         previousInventory = player.getInventory().getContents().clone();
         previousArmor = player.getInventory().getArmorContents().clone();
     }
 
-    public void restoreInventory(Player player) {
+    public void restoreInventory() {
         if (previousInventory != null) {
             player.getInventory().setContents(previousInventory);
         }
@@ -121,10 +123,15 @@ public class PracticePlayer {
     }
 
     public Player getPlayer() {
-        return Bukkit.getPlayer(uuid);
+        return player;
     }
 
     public enum PlayerState {
         SPAWN, QUEUE, DUEL, SPECTATING, EDITING, FFA
     }
+
+    public boolean isPlayerInGroup(String group) {
+        return player.hasPermission("group." + group);
+    }
+
 }

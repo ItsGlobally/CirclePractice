@@ -9,9 +9,11 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import top.nontage.nontagelib.utils.inventory.InventoryBuilder;
-
-public class gamemodes {
-    public static void open(Player p) {
+public class DuelMenu {
+    public static void open(Player p, boolean queue) {
+        open(p, queue, null);
+    }
+    public static void open(Player p, boolean queue, Player target) {
         PracticePlayer pp = CirclePractice.getInstance().getPlayerManager().getPlayer(p.getUniqueId());
         if (pp.getState() != PracticePlayer.PlayerState.SPAWN) {
             p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0f, 1.0f);
@@ -20,14 +22,18 @@ public class gamemodes {
         }
         InventoryBuilder inv = new InventoryBuilder(27, "Game modes");
         inv.setItem(new ItemBuilder(Material.IRON_AXE)
-                        .setDisplayName("&aFFA")
+                        .setDisplayName("&cNoDebuff")
                         .build(), clickInventoryEvent -> {
-                    InventoryClickEvent e = clickInventoryEvent.getEvent();
-                    e.setCancelled(true);
+                            InventoryClickEvent e = clickInventoryEvent.getEvent();
+                            e.setCancelled(true);
+                            if (queue) {
+                                p.performCommand("queue NoDebuff");
+                            } else {
+                                p.performCommand("duel " + target + "NoDebuff");
+                            }
+                            p.closeInventory();
 
-                    CirclePractice.getInstance().getFFAManager().spawn(p);
-
-                }, 13
+                }, 1
         );
         p.openInventory(inv.getInventory());
     }

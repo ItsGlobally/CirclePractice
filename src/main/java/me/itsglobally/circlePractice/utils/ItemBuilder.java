@@ -1,5 +1,6 @@
 package me.itsglobally.circlePractice.utils;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -36,7 +37,12 @@ public class ItemBuilder {
         item.setDurability(durability);
         return this;
     }
-
+    public ItemBuilder setWoolColor(DyeColor color) {
+        if (item.getType() == Material.WOOL) {
+            item.setDurability(color.getWoolData());
+        }
+        return this;
+    }
     public ItemBuilder addEnchantment(Enchantment enchantment, int level) {
         meta.addEnchant(enchantment, level, true);
         return this;

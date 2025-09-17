@@ -9,10 +9,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import top.nontage.nontagelib.utils.inventory.InventoryBuilder;
-/*
- @TODO: menu for duel & q system and wilson gay
- */
-public class duelmenu {
+
+public class GamemodeMenu {
     public static void open(Player p) {
         PracticePlayer pp = CirclePractice.getInstance().getPlayerManager().getPlayer(p.getUniqueId());
         if (pp.getState() != PracticePlayer.PlayerState.SPAWN) {
@@ -29,8 +27,20 @@ public class duelmenu {
 
                     CirclePractice.getInstance().getFFAManager().spawn(p);
 
-                }, 13
+                    p.closeInventory();
+                }, 12
         );
+        inv.setItem(new ItemBuilder(Material.IRON_AXE)
+                        .setDisplayName("&bDuels")
+                        .build(), clickInventoryEvent -> {
+                    InventoryClickEvent e = clickInventoryEvent.getEvent();
+                    e.setCancelled(true);
+
+                    DuelMenu.open(p, true);
+
+                }, 14
+        );
+
         p.openInventory(inv.getInventory());
     }
 }

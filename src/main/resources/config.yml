@@ -9,14 +9,14 @@ spawn:
   yaw: 0.0
   pitch: 0.0
 ffa:
-  - 1:
-    spawn:
-    world: practice
-    x: -1000
-    y: 100
-    z: -1000
-    yaw: 0.0
-    pitch: 0.0
+  - arena1:
+      spawn:
+        world: practice
+        x: -1000
+        y: 100
+        z: -1000
+        yaw: 0.0
+        pitch: 0.0
 # Plugin settings
 settings:
   # Time (in seconds) players wait in the queue before starting a duel

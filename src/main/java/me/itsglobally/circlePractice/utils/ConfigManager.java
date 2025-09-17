@@ -4,15 +4,14 @@ import me.itsglobally.circlePractice.CirclePractice;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ConfigManager {
 
@@ -109,26 +108,43 @@ public class ConfigManager {
 
     public List<Location> getFFASpawns() {
         List<Location> spawns = new ArrayList<>();
-        ConfigurationSection ffaSection = config.getConfigurationSection("ffa");
-        if (ffaSection == null) return spawns;
+        List<?> ffaList = config.getList("ffa");
 
-        for (String key : ffaSection.getKeys(false)) {
-            ConfigurationSection spawnSec = ffaSection.getConfigurationSection(key + ".spawn");
-            if (spawnSec == null) continue;
+        if (ffaList == null) return spawns;
 
-            String world = spawnSec.getString("world", "world");
-            double x = spawnSec.getDouble("x", 0.5);
-            double y = spawnSec.getDouble("y", 50);
-            double z = spawnSec.getDouble("z", 0.5);
-            float yaw = (float) spawnSec.getDouble("yaw", 0);
-            float pitch = (float) spawnSec.getDouble("pitch", 0);
+        for (Object obj : ffaList) {
+            if (!(obj instanceof Map)) continue;
 
-            Location loc = new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
-            spawns.add(loc);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> arenaMap = (Map<String, Object>) obj;
+
+            for (Object arenaData : arenaMap.values()) {
+                if (!(arenaData instanceof Map)) continue;
+                @SuppressWarnings("unchecked")
+                Map<String, Object> arenaValues = (Map<String, Object>) arenaData;
+
+                Object spawnObj = arenaValues.get("spawn");
+                if (!(spawnObj instanceof Map)) continue;
+                @SuppressWarnings("unchecked")
+                Map<String, Object> spawnValues = (Map<String, Object>) spawnObj;
+
+                String world = (String) spawnValues.getOrDefault("world", "world");
+                double x = ((Number) spawnValues.getOrDefault("x", 0.5)).doubleValue();
+                double y = ((Number) spawnValues.getOrDefault("y", 50)).doubleValue();
+                double z = ((Number) spawnValues.getOrDefault("z", 0.5)).doubleValue();
+                float yaw = ((Number) spawnValues.getOrDefault("yaw", 0)).floatValue();
+                float pitch = ((Number) spawnValues.getOrDefault("pitch", 0)).floatValue();
+
+                Location loc = new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
+                spawns.add(loc);
+            }
         }
 
         return spawns;
     }
+
+
+
 
 
 

@@ -22,6 +22,7 @@ public record FFAManager(CirclePractice plugin) {
             return;
         }
         pp.setState(PracticePlayer.PlayerState.FFA);
+        pp.saveInventory();
         spawn(p);
     }
 
@@ -34,7 +35,7 @@ public record FFAManager(CirclePractice plugin) {
         }
         pp.setState(PracticePlayer.PlayerState.FFA);
         plugin.getConfigManager().teleportToSpawn(p);
-        pp.restoreInventory(p);
+        pp.restoreInventory();
         plugin.getConfigManager().teleportToSpawn(p);
     }
 
@@ -45,7 +46,6 @@ public record FFAManager(CirclePractice plugin) {
             return;
         }
         PracticePlayer pp = plugin.getPlayerManager().getPlayer(p.getUniqueId());
-        pp.saveInventory(p);
         plugin.getKitManager().applyKit(p, "FFA");
 
     }

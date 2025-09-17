@@ -136,8 +136,8 @@ public class DuelManager {
 
         arena.setInUse(true);
 
-        pp1.saveInventory(player1);
-        pp2.saveInventory(player2);
+        pp1.saveInventory();
+        pp2.saveInventory();
 
         player1.teleport(arena.getPos1());
         player2.teleport(arena.getPos2());
@@ -207,14 +207,14 @@ public class DuelManager {
 
         if (p1 != null) {
             plugin.getConfigManager().teleportToSpawn(p1);
-            duel.getPlayer1().restoreInventory(p1);
+            duel.getPlayer1().restoreInventory();
             for (UUID u : duel.getSpectators()) {
                 if (Bukkit.getPlayer(u) != null) p1.showPlayer(Bukkit.getPlayer(u));
             }
         }
         if (p2 != null) {
             plugin.getConfigManager().teleportToSpawn(p2);
-            duel.getPlayer2().restoreInventory(p2);
+            duel.getPlayer2().restoreInventory();
             for (UUID u : duel.getSpectators()) {
                 if (Bukkit.getPlayer(u) != null) p2.showPlayer(Bukkit.getPlayer(u));
             }

@@ -103,7 +103,6 @@ public class EconomyManager {
         return "coins";
     }
 
-    // Reward methods for different activities
     public void rewardKill(Player player) {
         long reward = plugin.getConfigManager().getConfig().getLong("rewards.kill", 10);
         addCoins(player.getUniqueId(), reward);
@@ -118,9 +117,9 @@ public class EconomyManager {
     }
 
     public void rewardKillstreak(Player player, long streak) {
-        if (streak % 5 == 0) { // Every 5 kills
+        if (streak % 5 == 0) {
             long reward = plugin.getConfigManager().getConfig().getLong("rewards.killstreak-bonus", 50);
             addCoins(player.getUniqueId(), reward);
         }
     }
-} // what i mean how tf do u get my ip
+}

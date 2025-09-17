@@ -1,6 +1,6 @@
 package me.itsglobally.circlePractice.commands;
 
-import me.itsglobally.circlePractice.menus.gamemodes;
+import me.itsglobally.circlePractice.menus.GamemodeMenu;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -22,7 +22,7 @@ public class MenuCommand implements NontageCommand {
         String menuName = strings[0];
 
         switch (menuName) {
-            case "gamemode" -> gamemodes.open(p);
+            case "gamemode" -> GamemodeMenu.open(p);
             default -> MessageUtil.sendMessage(p, "&cMenu not found!");
         }
     }

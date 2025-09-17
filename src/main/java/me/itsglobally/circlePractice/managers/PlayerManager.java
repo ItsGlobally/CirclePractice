@@ -2,7 +2,9 @@ package me.itsglobally.circlePractice.managers;
 
 import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.PracticePlayer;
+import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.types.PrefixNode;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -57,5 +59,24 @@ public class PlayerManager {
         return getPrefix(p) + p.getName();
     }
 
+    public void setPrefixAsRank(Player p, String rank) {
+        User user = plugin.getLuckPerms().getUserManager().getUser(p.getUniqueId());
+        if (user == null) return;
 
+        Group group = plugin.getLuckPerms().getGroupManager().getGroup(rank.toLowerCase());
+        if (group == null) return;
+
+        String prefix = group.getCachedData().getMetaData().getPrefix();
+        if (prefix == null) return;
+
+        user.data().toCollection().stream()
+                .filter(n -> n instanceof PrefixNode)
+                .map(n -> (PrefixNode) n)
+                .filter(n -> n.getPriority() == 999)
+                .forEach(n -> user.data().remove(n));
+
+        user.data().add(PrefixNode.builder(prefix, 999).build());
+
+        plugin.getLuckPerms().getUserManager().saveUser(user);
+    }
 }
