@@ -6,18 +6,19 @@ import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 import top.nontage.nontagelib.annotations.AutoListener;
 
 @AutoListener
@@ -25,6 +26,23 @@ public class PlayerListener implements Listener {
 
     private final CirclePractice plugin = CirclePractice.getInstance();
 
+    @EventHandler
+    public void onPlayerVelocity(PlayerVelocityEvent e) {
+        Player p = e.getPlayer();
+        EntityDamageEvent event = p.getLastDamageCause();
+        if (event != null && !event.isCancelled() && event instanceof EntityDamageByEntityEvent) {
+            Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
+            if (damager instanceof Arrow) {
+                if (((Arrow) damager).getShooter().equals(p)) {
+                    Vector velocity = e.getVelocity();
+                    double speed = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
+                    Vector dir = damager.getLocation().getDirection().normalize();
+                    Vector vector = new Vector(dir.getX() * speed * -1.0D, velocity.getY(), dir.getZ() * speed);
+                    e.setVelocity(vector);
+                }
+            }
+        }
+    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -61,7 +79,10 @@ public class PlayerListener implements Listener {
         plugin.getPlayerManager().removePlayer(player.getUniqueId());
     }
 
-
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        if (e.getPlayer().getLocation().getY() <= 50 && plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId()).isInSpawn()) plugin.getConfigManager().teleportToSpawn(e.getPlayer());
+    }
     @EventHandler
     public void onMessage(AsyncPlayerChatEvent e) {
         e.setCancelled(true);
@@ -97,7 +118,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onBlockPlaced(BlockPlaceEvent e) {
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
-        if (pP.getState() == PracticePlayer.PlayerState.SPAWN || pP.isInFFA()) {
+        if (pP.isInSpawn()) {
             if (TempData.getBuild(e.getPlayer().getUniqueId())) {
                 return;
             }
@@ -108,6 +129,10 @@ public class PlayerListener implements Listener {
     public void onHit(EntityDamageByEntityEvent e) {
         if (!(e.getDamager() instanceof Player p)) return;
         if (plugin.getPlayerManager().getPlayer(p.getUniqueId()).isInSpawn()) e.setCancelled(true);
+    }
+    @EventHandler
+    public void onDmg(EntityDamageEvent e) {
+        if (e.getCause() == EntityDamageEvent.DamageCause.FALL) e.setCancelled(true);
     }
     @EventHandler
     public void onPotionDrink(PlayerItemConsumeEvent event) {

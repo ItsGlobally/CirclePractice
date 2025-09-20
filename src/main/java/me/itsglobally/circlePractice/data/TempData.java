@@ -12,6 +12,7 @@ public class TempData {
     private static final HashMap<UUID, Long> ks = new HashMap<>();
     private static final HashMap<UUID, Boolean> build = new HashMap<>();
     private static final List<Location> blockplaced = new ArrayList<>();
+    private static final List<Location> ffablockplaced = new ArrayList<>();
     private static Location ffaCurrentSpawn;
 
     public static UUID getLastHit(UUID vic) {
@@ -42,6 +43,17 @@ public class TempData {
         build.put(vic, !getBuild(vic));
     }
 
+    public static void addFFABlockPlaced(Location l) {
+        ffablockplaced.add(l);
+    }
+
+    public static void removeFFABlockPlaced(Location l) {
+        ffablockplaced.remove(l);
+    }
+
+    public static List<Location> getFFABlockPlaced() {
+        return ffablockplaced;
+    }
     public static void addBlockPlaced(Location l) {
         blockplaced.add(l);
     }

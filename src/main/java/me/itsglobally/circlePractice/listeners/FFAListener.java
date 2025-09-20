@@ -40,10 +40,6 @@ public class FFAListener implements Listener {
         if (!(e.getEntity() instanceof Player player)) return;
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
         if (pP.isInFFA()) {
-            if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                e.setCancelled(true);
-                return;
-            }
             if (e instanceof EntityDamageByEntityEvent edbee) {
                 Entity dmgere = edbee.getDamager();
                 Entity vice = e.getEntity();
@@ -71,7 +67,7 @@ public class FFAListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (e.getPlayer().getLocation().getY() <= 50) plugin.getFFAManager().spawn(e.getPlayer());
+        if (e.getPlayer().getLocation().getY() <= 50 && plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId()).isInFFA()) plugin.getFFAManager().spawn(e.getPlayer());
     }
 
     @EventHandler
@@ -79,6 +75,9 @@ public class FFAListener implements Listener {
         Player player = e.getPlayer();
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
         if (pP.isInFFA()) {
+            if (TempData.getBuild(e.getPlayer().getUniqueId())) {
+                return;
+            }
             if (e.getBlockPlaced().getY() >= 100) {
                 e.setCancelled(true);
                 MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
@@ -89,12 +88,12 @@ public class FFAListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            TempData.addBlockPlaced(e.getBlockPlaced().getLocation());
+            TempData.addFFABlockPlaced(e.getBlockPlaced().getLocation());
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     e.getBlockPlaced().setType(Material.AIR);
-                    TempData.removeBlockPlaced(e.getBlockPlaced().getLocation());
+                    TempData.removeFFABlockPlaced(e.getBlockPlaced().getLocation());
                 }
             }.runTaskLater(plugin, 8 * 20L);
         }
@@ -109,11 +108,11 @@ public class FFAListener implements Listener {
                 e.setCancelled(true);
                 MessageUtil.sendActionBar(player, "&cYou cannot break blocks here!");
             }
-            if (!TempData.getBlockPlaced().contains(e.getBlock().getLocation())) {
+            if (!TempData.getFFABlockPlaced().contains(e.getBlock().getLocation())) {
                 e.setCancelled(true);
                 MessageUtil.sendActionBar(player, "&cYou cannot break this block!");
             }
-            TempData.getBlockPlaced().remove(e.getBlock().getLocation());
+            TempData.getFFABlockPlaced().remove(e.getBlock().getLocation());
         }
     }
 }

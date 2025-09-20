@@ -29,8 +29,6 @@ public class DuelListener implements Listener {
     public void onEntityDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) event.setCancelled(true);
-
         PracticePlayer practicePlayer = plugin.getPlayerManager().getPlayer(player);
 
         if (practicePlayer != null && practicePlayer.isInDuel()) {
@@ -71,8 +69,8 @@ public class DuelListener implements Listener {
             Duel duel = practicePlayer.getCurrentDuel();
             PracticePlayer winner = duel.getOpponent(practicePlayer);
 
-            MessageUtil.sendTitle(player, "&cDEFEAT!", "You have been defeated by " + winner.getName());
-            MessageUtil.sendTitle(winner.getPlayer(), "&aVICTORY!", "You have defeated " + practicePlayer.getName());
+            MessageUtil.sendTitle(player, "&cDEFEAT!", "");
+            MessageUtil.sendTitle(winner.getPlayer(), "&aVICTORY!", "");
             plugin.getDuelManager().endDuel(duel, winner);
         }
     }
