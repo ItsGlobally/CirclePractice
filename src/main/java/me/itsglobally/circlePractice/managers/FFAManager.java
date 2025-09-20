@@ -33,7 +33,7 @@ public record FFAManager(CirclePractice plugin) {
             p.playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0f, 1.0f);
             return;
         }
-        pp.setState(PracticePlayer.PlayerState.FFA);
+        pp.setState(PracticePlayer.PlayerState.SPAWN);
         plugin.getConfigManager().teleportToSpawn(p);
         pp.restoreInventory();
         plugin.getConfigManager().teleportToSpawn(p);
@@ -43,9 +43,10 @@ public record FFAManager(CirclePractice plugin) {
         try {
             teleportToFFASpawn(p);
         } catch (IllegalStateException e) {
+            leaveFFA(p);
             return;
         }
-        PracticePlayer pp = plugin.getPlayerManager().getPlayer(p.getUniqueId());
+        p.getInventory().clear();
         plugin.getKitManager().applyKit(p, "FFA");
 
     }

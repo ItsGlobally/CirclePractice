@@ -29,14 +29,13 @@ public class ConfigManager {
     }
 
     public void setupConfig() {
-        // Main config
+
         configFile = new File(plugin.getDataFolder(), "config.yml");
         if (!configFile.exists()) {
             plugin.saveDefaultConfig();
         }
         config = plugin.getConfig();
 
-        // Kits config
         kitsFile = new File(plugin.getDataFolder(), "kits.yml");
         if (!kitsFile.exists()) {
             try {
@@ -51,7 +50,6 @@ public class ConfigManager {
     }
 
     private void setupDefaults() {
-        // Default configuration values
         if (!config.contains("spawn")) {
             config.set("spawn.world", "practice");
             config.set("spawn.x", 0.5);
@@ -61,9 +59,7 @@ public class ConfigManager {
             config.set("spawn.pitch", 0);
         }
 
-        // Example default FFA spawn list
         if (!config.contains("ffa")) {
-            List<String> defaults = new ArrayList<>();
             config.set("ffa.1.spawn.world", "practice");
             config.set("ffa.1.spawn.x", -1000.5);
             config.set("ffa.1.spawn.y", 100);
@@ -129,9 +125,9 @@ public class ConfigManager {
                 Map<String, Object> spawnValues = (Map<String, Object>) spawnObj;
 
                 String world = (String) spawnValues.getOrDefault("world", "world");
-                double x = ((Number) spawnValues.getOrDefault("x", 0.5)).doubleValue();
+                double x = ((Number) spawnValues.getOrDefault("x", -1000.5)).doubleValue();
                 double y = ((Number) spawnValues.getOrDefault("y", 50)).doubleValue();
-                double z = ((Number) spawnValues.getOrDefault("z", 0.5)).doubleValue();
+                double z = ((Number) spawnValues.getOrDefault("z", 1000.5)).doubleValue();
                 float yaw = ((Number) spawnValues.getOrDefault("yaw", 0)).floatValue();
                 float pitch = ((Number) spawnValues.getOrDefault("pitch", 0)).floatValue();
 

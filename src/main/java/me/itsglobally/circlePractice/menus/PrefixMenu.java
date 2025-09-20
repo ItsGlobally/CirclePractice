@@ -10,8 +10,10 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 import top.nontage.nontagelib.utils.inventory.InventoryBuilder;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -26,7 +28,16 @@ public class PrefixMenu {
             MessageUtil.sendMessage(p, "&cYou are not in the spawn!");
             return;
         }
-        InventoryBuilder inv = new InventoryBuilder(27, "Game modes");
+        InventoryBuilder inv = new InventoryBuilder(27, "Set your prefix");
+        ItemStack filler = new ItemBuilder(Material.STAINED_GLASS_PANE)
+                .setWoolColor(DyeColor.GRAY)
+                .setDisplayName(" ")
+                .setLore(Collections.emptyList())
+                .build();
+
+        for (int i = 0; i < 27; i++) {
+            inv.setItem(filler, e -> e.getEvent().setCancelled(true), i);
+        }
         inv.setItem(new ItemBuilder(Material.WOOL)
                 .setWoolColor(DyeColor.GRAY)
                 .setDisplayName("&7DEFAULT")

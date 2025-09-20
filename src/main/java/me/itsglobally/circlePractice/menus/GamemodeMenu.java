@@ -4,11 +4,15 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.utils.ItemBuilder;
 import me.itsglobally.circlePractice.utils.MessageUtil;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 import top.nontage.nontagelib.utils.inventory.InventoryBuilder;
+
+import java.util.Collections;
 
 public class GamemodeMenu {
     public static void open(Player p) {
@@ -19,6 +23,15 @@ public class GamemodeMenu {
             return;
         }
         InventoryBuilder inv = new InventoryBuilder(27, "Game modes");
+        ItemStack filler = new ItemBuilder(Material.STAINED_GLASS_PANE)
+                .setWoolColor(DyeColor.GRAY)
+                .setDisplayName(" ")
+                .setLore(Collections.emptyList())
+                .build();
+
+        for (int i = 0; i < 27; i++) {
+            inv.setItem(filler, e -> e.getEvent().setCancelled(true), i);
+        }
         inv.setItem(new ItemBuilder(Material.IRON_AXE)
                         .setDisplayName("&aFFA")
                         .build(), clickInventoryEvent -> {
