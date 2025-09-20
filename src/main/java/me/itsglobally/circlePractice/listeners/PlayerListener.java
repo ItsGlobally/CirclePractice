@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -103,7 +104,11 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
         }
     }
-
+    @EventHandler
+    public void onHit(EntityDamageByEntityEvent e) {
+        if (!(e.getDamager() instanceof Player p)) return;
+        if (plugin.getPlayerManager().getPlayer(p.getUniqueId()).isInSpawn()) e.setCancelled(true);
+    }
     @EventHandler
     public void onPotionDrink(PlayerItemConsumeEvent event) {
         ItemStack item = event.getItem();

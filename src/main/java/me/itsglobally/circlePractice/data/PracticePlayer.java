@@ -130,6 +130,10 @@ public class PracticePlayer {
         return player.hasPermission("group." + group);
     }
 
+    public boolean isInSpawn() {
+        return state == PlayerState.SPAWN || state == PlayerState.EDITING;
+    }
+
     public enum PlayerState {
         SPAWN, QUEUE, DUEL, SPECTATING, EDITING, FFA
     }

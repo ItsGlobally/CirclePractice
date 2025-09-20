@@ -42,6 +42,9 @@ public record FFAManager(CirclePractice plugin) {
     public void spawn(Player p) {
         try {
             teleportToFFASpawn(p);
+            if (TempData.getLastHit(p.getUniqueId()) != null) {
+                kill(p, Bukkit.getPlayer(TempData.getLastHit(p.getUniqueId())));
+            }
         } catch (IllegalStateException e) {
             leaveFFA(p);
             return;
@@ -61,7 +64,6 @@ public record FFAManager(CirclePractice plugin) {
         TempData.setLastHit(vic.getUniqueId(), null);
         if (TempData.getLastHit(klr.getUniqueId()) == vic.getUniqueId()) TempData.setLastHit(klr.getUniqueId(), null);
 
-        TempData.setKs(vic.getUniqueId(), 0);
         TempData.addKs(klr.getUniqueId(), 1);
 
         plugin.getFileDataManager().updateFfaStats(klr.getUniqueId(), 1, 0);
@@ -78,6 +80,7 @@ public record FFAManager(CirclePractice plugin) {
         plugin.getEconomyManager().addCoins(klr.getUniqueId(), TempData.getKs(klr.getUniqueId()) * 10);
 
         if (vic != null) {
+            TempData.setKs(vic.getUniqueId(), 0);
             vic.playSound(vic.getLocation(), Sound.ORB_PICKUP, 1.0f, 1.0f);
             MessageUtil.sendActionBar(vic, plugin.getPlayerManager().getPrefix(klr) + klr.getName() + "&rhas killed " + plugin.getPlayerManager().getPrefix(vic) + vic.getName() + "&r!");
         }

@@ -13,6 +13,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import top.nontage.nontagelib.annotations.AutoListener;
 
@@ -24,10 +26,20 @@ public class FFAListener implements Listener {
 
 
     @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        PracticePlayer pP = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
+        if (pP.isInFFA()) {
+            if (TempData.getLastHit(e.getPlayer().getUniqueId()) != null) {
+                TempData.setLastHit(TempData.getLastHit(e.getPlayer().getUniqueId()), null);
+            }
+        }
+    }
+
+    @EventHandler
     public void onDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player player)) return;
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
-        if (pP.getState() == PracticePlayer.PlayerState.FFA) {
+        if (pP.isInFFA()) {
             if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
                 e.setCancelled(true);
                 return;
@@ -43,7 +55,7 @@ public class FFAListener implements Listener {
                     e.setCancelled(true);
                     return;
                 }
-                if (vic.getLocation().getY() <= 200 || dmger.getLocation().getY() <= 200) {
+                if (vic.getLocation().getY() >= 100 || dmger.getLocation().getY() >= 100) {
                     e.setCancelled(true);
                     return;
                 }
@@ -58,11 +70,16 @@ public class FFAListener implements Listener {
     }
 
     @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        if (e.getPlayer().getLocation().getY() <= 50) plugin.getFFAManager().spawn(e.getPlayer());
+    }
+
+    @EventHandler
     public void onPlace(BlockPlaceEvent e) {
         Player player = e.getPlayer();
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
-        if (pP.getState() == PracticePlayer.PlayerState.FFA) {
-            if (e.getBlockPlaced().getY() <= 200) {
+        if (pP.isInFFA()) {
+            if (e.getBlockPlaced().getY() >= 100) {
                 e.setCancelled(true);
                 MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
             }
@@ -87,8 +104,8 @@ public class FFAListener implements Listener {
     public void onBreak(BlockBreakEvent e) {
         Player player = e.getPlayer();
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
-        if (pP.getState() == PracticePlayer.PlayerState.FFA) {
-            if (e.getBlock().getY() <= 200) {
+        if (pP.isInFFA()) {
+            if (e.getBlock().getY() >= 100) {
                 e.setCancelled(true);
                 MessageUtil.sendActionBar(player, "&cYou cannot break blocks here!");
             }
