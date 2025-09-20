@@ -37,12 +37,14 @@ public class ItemBuilder {
         item.setDurability(durability);
         return this;
     }
+
     public ItemBuilder setWoolColor(DyeColor color) {
         if (item.getType() == Material.WOOL) {
             item.setDurability(color.getWoolData());
         }
         return this;
     }
+
     public ItemBuilder addEnchantment(Enchantment enchantment, int level) {
         meta.addEnchant(enchantment, level, true);
         return this;

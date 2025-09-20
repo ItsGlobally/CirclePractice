@@ -70,6 +70,7 @@ public class PlayerListener implements Listener {
                         + e.getMessage()
         ));
     }
+
     @EventHandler
     public void onHungry(FoodLevelChangeEvent e) {
         if (!(e.getEntity() instanceof Player p)) {
@@ -80,8 +81,9 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
         }
     }
+
     @EventHandler
-    public void onBlockBreak(BlockBreakEvent e){
+    public void onBlockBreak(BlockBreakEvent e) {
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
         if (pP.getState() == PracticePlayer.PlayerState.SPAWN || pP.isInFFA()) {
             if (TempData.getBuild(e.getPlayer().getUniqueId())) {
@@ -90,8 +92,9 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
         }
     }
+
     @EventHandler
-    public void onBlockPlaced(BlockPlaceEvent e){
+    public void onBlockPlaced(BlockPlaceEvent e) {
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId());
         if (pP.getState() == PracticePlayer.PlayerState.SPAWN || pP.isInFFA()) {
             if (TempData.getBuild(e.getPlayer().getUniqueId())) {
@@ -100,13 +103,14 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
         }
     }
+
     @EventHandler
     public void onPotionDrink(PlayerItemConsumeEvent event) {
         ItemStack item = event.getItem();
 
         if (item.getType() == Material.POTION) {
             event.getPlayer().getServer().getScheduler().runTaskLater(
-                   plugin,
+                    plugin,
                     () -> {
                         event.getPlayer().getInventory().removeItem(new ItemStack(Material.GLASS_BOTTLE, 1));
                     },

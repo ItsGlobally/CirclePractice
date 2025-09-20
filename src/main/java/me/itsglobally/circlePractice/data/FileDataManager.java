@@ -204,6 +204,7 @@ public class FileDataManager {
         }
         return false;
     }
+
     public long getXp(UUID uuid) {
         return getCachedData(uuid).getXp();
     }
@@ -298,23 +299,65 @@ public class FileDataManager {
             this.name = name;
         }
 
-        public UUID getUuid() { return uuid; }
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-        public long getFirstJoin() { return firstJoin; }
-        public void setFirstJoin(long firstJoin) { this.firstJoin = firstJoin; }
-        public long getLastSeen() { return lastSeen; }
-        public void setLastSeen(long lastSeen) { this.lastSeen = lastSeen; }
-        public Map<String, PlayerStats> getStats() { return stats; }
-        public Map<String, String> getKits() { return kits; }
-        public FfaStats getFfaStats() { return ffaStats; }
-        public void setFfaStats(FfaStats ffaStats) { this.ffaStats = ffaStats; }
+        public UUID getUuid() {
+            return uuid;
+        }
 
-        public long getStars() { return stars; }
-        public void setStars(long stars) { this.stars = stars; }
+        public String getName() {
+            return name;
+        }
 
-        public long getXp() { return xp; }
-        public void setXp(long xp) { this.xp = xp; }
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public long getFirstJoin() {
+            return firstJoin;
+        }
+
+        public void setFirstJoin(long firstJoin) {
+            this.firstJoin = firstJoin;
+        }
+
+        public long getLastSeen() {
+            return lastSeen;
+        }
+
+        public void setLastSeen(long lastSeen) {
+            this.lastSeen = lastSeen;
+        }
+
+        public Map<String, PlayerStats> getStats() {
+            return stats;
+        }
+
+        public Map<String, String> getKits() {
+            return kits;
+        }
+
+        public FfaStats getFfaStats() {
+            return ffaStats;
+        }
+
+        public void setFfaStats(FfaStats ffaStats) {
+            this.ffaStats = ffaStats;
+        }
+
+        public long getStars() {
+            return stars;
+        }
+
+        public void setStars(long stars) {
+            this.stars = stars;
+        }
+
+        public long getXp() {
+            return xp;
+        }
+
+        public void setXp(long xp) {
+            this.xp = xp;
+        }
 
     }
 }

@@ -7,7 +7,7 @@ import top.nontage.nontagelib.annotations.CommandInfo;
 import top.nontage.nontagelib.command.NontageCommand;
 
 
-@CommandInfo(name="prefix")
+@CommandInfo(name = "prefix")
 public class PrefixCommand implements NontageCommand {
 
     @Override

@@ -4,7 +4,6 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.utils.ItemBuilder;
 import me.itsglobally.circlePractice.utils.MessageUtil;
-import net.luckperms.api.messenger.message.Message;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -104,7 +103,8 @@ public class PrefixMenu {
             plugin.getPlayerManager().setPrefixAsRank(p, "builder");
             MessageUtil.sendActionBar(p, "&cSet your prefix as " + plugin.getPlayerManager().getPrefix(p));
 
-        }, 19);inv.setItem(new ItemBuilder(Material.WOOL)
+        }, 19);
+        inv.setItem(new ItemBuilder(Material.WOOL)
                 .setWoolColor(DyeColor.PURPLE)
                 .setDisplayName("&1MOD")
                 .setLore(List.of(pp.isPlayerInGroup("mod") ? "&aOwned!" : "&cNot owner!"))
@@ -137,8 +137,6 @@ public class PrefixMenu {
             MessageUtil.sendActionBar(p, "&cSet your prefix as " + plugin.getPlayerManager().getPrefix(p));
 
         }, 25);
-
-
 
 
         p.openInventory(inv.getInventory());

@@ -3,26 +3,25 @@ package me.itsglobally.circlePractice.utils;
 import me.itsglobally.circlePractice.CirclePractice;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class ConfigManager {
 
     private final CirclePractice plugin;
+    private final Random random = new Random();
     private FileConfiguration config;
     private FileConfiguration kits;
-
     private File configFile;
     private File kitsFile;
-
-    private final Random random = new Random();
 
     public ConfigManager(CirclePractice plugin) {
         this.plugin = plugin;
@@ -138,10 +137,6 @@ public class ConfigManager {
 
         return spawns;
     }
-
-
-
-
 
 
     public void teleportToSpawn(Player player) {

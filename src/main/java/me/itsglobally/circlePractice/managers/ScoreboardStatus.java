@@ -1,7 +1,6 @@
 package me.itsglobally.circlePractice.managers;
 
 import me.itsglobally.circlePractice.CirclePractice;
-import me.itsglobally.circlePractice.data.FileDataManager;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.utils.NMSUtils;
 import org.bukkit.Bukkit;

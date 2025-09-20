@@ -106,8 +106,6 @@ public class RankMenu {
         }, 15);
 
 
-
-
         p.openInventory(inv.getInventory());
     }
 }

@@ -29,8 +29,7 @@ public class LeaveCommand implements NontageCommand {
                     practicePlayer.getCurrentDuel().getOpponent(practicePlayer));
         } else if (practicePlayer.isInFFA()) {
             plugin.getFFAManager().leaveFFA(player);
-        }
-        else {
+        } else {
             MessageUtil.sendMessage(player, "&cYou're not in a queue or duel!");
         }
 

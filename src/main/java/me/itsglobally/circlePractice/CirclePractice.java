@@ -134,6 +134,7 @@ public class CirclePractice extends JavaPlugin {
     public EconomyManager getEconomyManager() {
         return economyManager;
     }
+
     public ScoreboardStatus getScoreboardStatus() {
         return scoreboardStatus;
     }

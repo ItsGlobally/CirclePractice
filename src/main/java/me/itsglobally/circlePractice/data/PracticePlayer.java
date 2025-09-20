@@ -20,7 +20,7 @@ public class PracticePlayer {
     private long queueStartTime;
     private ItemStack[] previousInventory;
     private ItemStack[] previousArmor;
-    private Player player;
+    private final Player player;
 
     public PracticePlayer(UUID uuid, String name) {
         this.uuid = uuid;
@@ -126,12 +126,12 @@ public class PracticePlayer {
         return player;
     }
 
-    public enum PlayerState {
-        SPAWN, QUEUE, DUEL, SPECTATING, EDITING, FFA
-    }
-
     public boolean isPlayerInGroup(String group) {
         return player.hasPermission("group." + group);
+    }
+
+    public enum PlayerState {
+        SPAWN, QUEUE, DUEL, SPECTATING, EDITING, FFA
     }
 
 }

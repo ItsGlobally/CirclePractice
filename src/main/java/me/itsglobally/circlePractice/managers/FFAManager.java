@@ -94,6 +94,7 @@ public record FFAManager(CirclePractice plugin) {
         }
 
     }
+
     public Location randomSpawn() throws IllegalStateException {
         List<Location> spawns = plugin.getConfigManager().getFFASpawns();
         if (spawns.isEmpty()) {
@@ -101,8 +102,9 @@ public record FFAManager(CirclePractice plugin) {
         }
         return spawns.get(new Random().nextInt(spawns.size()));
     }
+
     public void teleportToFFASpawn(Player p) throws IllegalStateException {
-            p.teleport(TempData.getFfaCurrentSpawn());
+        p.teleport(TempData.getFfaCurrentSpawn());
     }
 
 }

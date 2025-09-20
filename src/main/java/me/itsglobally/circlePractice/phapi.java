@@ -25,10 +25,14 @@ public class phapi extends PlaceholderExpansion {
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         return switch (params) {
-            case "sb1" -> MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 1));
-            case "sb2" -> MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 2));
-            case "sb3" -> MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 3));
-            case "sb4" -> MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 4));
+            case "sb1" ->
+                    MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 1));
+            case "sb2" ->
+                    MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 2));
+            case "sb3" ->
+                    MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 3));
+            case "sb4" ->
+                    MessageUtil.formatMessage(CirclePractice.getInstance().getScoreboardStatus().getPlayerCurrentLine(player.getPlayer(), 4));
             default -> "";
         };
     }

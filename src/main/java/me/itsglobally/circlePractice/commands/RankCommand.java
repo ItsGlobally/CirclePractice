@@ -7,7 +7,7 @@ import top.nontage.nontagelib.annotations.CommandInfo;
 import top.nontage.nontagelib.command.NontageCommand;
 
 
-@CommandInfo(name="rank")
+@CommandInfo(name = "rank")
 public class RankCommand implements NontageCommand {
 
     @Override

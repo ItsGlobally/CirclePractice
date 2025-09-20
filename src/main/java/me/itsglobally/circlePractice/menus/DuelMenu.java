@@ -18,6 +18,7 @@ public class DuelMenu {
     public static void open(Player p, boolean queue) {
         open(p, queue, null);
     }
+
     public static void open(Player p, boolean queue, Player target) {
         PracticePlayer pp = CirclePractice.getInstance().getPlayerManager().getPlayer(p.getUniqueId());
         if (pp.getState() != PracticePlayer.PlayerState.SPAWN) {
@@ -38,14 +39,14 @@ public class DuelMenu {
         inv.setItem(new ItemBuilder(Material.IRON_AXE)
                         .setDisplayName("&cNoDebuff")
                         .build(), clickInventoryEvent -> {
-                            InventoryClickEvent e = clickInventoryEvent.getEvent();
-                            e.setCancelled(true);
-                            if (queue) {
-                                p.performCommand("queue NoDebuff");
-                            } else {
-                                p.performCommand("duel " + target + "NoDebuff");
-                            }
-                            p.closeInventory();
+                    InventoryClickEvent e = clickInventoryEvent.getEvent();
+                    e.setCancelled(true);
+                    if (queue) {
+                        p.performCommand("queue NoDebuff");
+                    } else {
+                        p.performCommand("duel " + target + "NoDebuff");
+                    }
+                    p.closeInventory();
 
                 }, 1
         );
