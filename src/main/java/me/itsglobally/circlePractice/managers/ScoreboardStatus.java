@@ -9,41 +9,40 @@ import org.bukkit.entity.Player;
 public record ScoreboardStatus(CirclePractice plugin) {
     public String getPlayerCurrentLine(Player p, int line) {
         PracticePlayer pp = plugin.getPlayerManager().getPlayer(p.getUniqueId());
-        PracticePlayer.PlayerState ps = pp.getState();
         switch (line) {
             case 1 -> {
-                if (ps == PracticePlayer.PlayerState.FFA) {
+                if (pp.isInFFA()) {
                     return "Kills: " + plugin.getFileDataManager().getFfaStats(p.getUniqueId()).kills();
                 }
-                if (ps == PracticePlayer.PlayerState.DUEL) {
+                if (pp.isInDuel()) {
                     return "Your opponent: " + pp.getCurrentDuel().getOpponent(pp);
                 }
             }
             case 2 -> {
-                if (ps == PracticePlayer.PlayerState.SPAWN) {
+                if (pp.isInSpawnIncludeQueuing()) {
                     return "Online Player: &d" + Bukkit.getOnlinePlayers().toArray().length;
                 }
-                if (ps == PracticePlayer.PlayerState.DUEL) {
+                if (pp.isInDuel()) {
                     return "Your ping: " + NMSUtils.getPing(p);
                 }
-                if (ps == PracticePlayer.PlayerState.FFA) {
+                if (pp.isInFFA()) {
                     return "Deaths: " + plugin.getFileDataManager().getFfaStats(p.getUniqueId()).deaths();
                 }
             }
             case 3 -> {
-                if (ps == PracticePlayer.PlayerState.SPAWN) {
-                    return "Coins: &d" + plugin.getEconomyManager().getBalance(p);
+                if (pp.isInSpawnIncludeQueuing()) {
+                    return "Coins: &d" + plugin.getEconomyManager().getCoins(p.getUniqueId());
                 }
-                if (ps == PracticePlayer.PlayerState.FFA) {
+                if (pp.isInDuel()) {
                     return "K/D: " + plugin.getFileDataManager().getFfaStats(p.getUniqueId()).getKDR();
                 }
-                if (ps == PracticePlayer.PlayerState.DUEL) {
+                if (pp.isInDuel()) {
                     return "Their ping: " + NMSUtils.getPing(pp.getCurrentDuel().getOpponent(pp).getPlayer());
                 }
             }
             case 4 -> {
-                if (ps == PracticePlayer.PlayerState.FFA) {
-                    return "Coins: &d" + plugin.getFileDataManager().getCoins(p.getUniqueId());
+                if (pp.isInFFA()) {
+                    return "Coins: &d" + plugin.getEconomyManager().getCoins(p.getUniqueId());
                 }
             }
         }

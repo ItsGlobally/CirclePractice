@@ -1,11 +1,9 @@
 package me.itsglobally.circlePractice.data;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TempData {
     private static final HashMap<UUID, UUID> lastHit = new HashMap<>();
@@ -14,7 +12,7 @@ public class TempData {
     private static final List<Location> blockplaced = new ArrayList<>();
     private static final List<Location> ffablockplaced = new ArrayList<>();
     private static Location ffaCurrentSpawn;
-
+    private static final Map<UUID, String> nicknames = new HashMap<>();
     public static UUID getLastHit(UUID vic) {
         return lastHit.getOrDefault(vic, null);
     }
@@ -73,4 +71,15 @@ public class TempData {
     public static void setFfaCurrentSpawn(Location ffaCurrentSpawn) {
         TempData.ffaCurrentSpawn = ffaCurrentSpawn;
     }
+
+    public static void setNick(Player player, String nick) {
+        nicknames.put(player.getUniqueId(), nick);
+    }
+
+    public static void resetNick(Player player) {
+        nicknames.remove(player.getUniqueId());
+    }
+
+    public static Map<UUID, String> getNicknames() { return nicknames; }
+
 }

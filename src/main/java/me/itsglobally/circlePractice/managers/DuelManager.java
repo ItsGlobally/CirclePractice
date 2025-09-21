@@ -100,10 +100,6 @@ public class DuelManager {
     }
 
     public void startDuel(Player player1, Player player2, String kit) {
-        player1.setAllowFlight(false);
-        player2.setAllowFlight(false);
-        player1.setFlying(false);
-        player2.setFlying(false);
         PracticePlayer pp1 = plugin.getPlayerManager().getPlayer(player1);
         PracticePlayer pp2 = plugin.getPlayerManager().getPlayer(player2);
         // Check if players are available
@@ -141,6 +137,12 @@ public class DuelManager {
 
         player1.teleport(arena.getPos1());
         player2.teleport(arena.getPos2());
+        player1.setAllowFlight(false);
+        player1.setFlying(false);
+        player2.setAllowFlight(false);
+        player2.setFlying(false);
+        player1.showPlayer(player2);
+        player2.showPlayer(player1);
 
         plugin.getKitManager().applyKit(player1, kit);
         plugin.getKitManager().applyKit(player2, kit);
@@ -207,6 +209,7 @@ public class DuelManager {
 
         if (p1 != null) {
             plugin.getConfigManager().teleportToSpawn(p1);
+
             duel.getPlayer1().restoreInventory();
             for (UUID u : duel.getSpectators()) {
                 if (Bukkit.getPlayer(u) != null) p1.showPlayer(Bukkit.getPlayer(u));

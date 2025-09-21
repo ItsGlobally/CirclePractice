@@ -133,6 +133,9 @@ public class PracticePlayer {
     public boolean isInSpawn() {
         return state == PlayerState.SPAWN || state == PlayerState.EDITING;
     }
+    public boolean isInSpawnIncludeQueuing() {
+        return state == PlayerState.SPAWN || state == PlayerState.EDITING || state == PlayerState.QUEUE;
+    }
 
     public enum PlayerState {
         SPAWN, QUEUE, DUEL, SPECTATING, EDITING, FFA

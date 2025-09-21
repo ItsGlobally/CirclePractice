@@ -24,6 +24,8 @@ public record FFAManager(CirclePractice plugin) {
         pp.setState(PracticePlayer.PlayerState.FFA);
         pp.saveInventory();
         spawn(p);
+        p.setAllowFlight(false);
+        p.setFlying(false);
     }
 
     public void leaveFFA(Player p) {

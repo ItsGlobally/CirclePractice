@@ -22,7 +22,7 @@ public class CoinsCommand implements NontageCommand {
                 return;
             }
 
-            long coins = plugin.getEconomyManager().getCoins(player.getUniqueId());
+            double coins = plugin.getEconomyManager().getCoins(player.getUniqueId());
             MessageUtil.sendMessage(player, "&eYour balance: &a" +
                     plugin.getEconomyManager().formatBalance(coins));
             return;
@@ -46,7 +46,7 @@ public class CoinsCommand implements NontageCommand {
                 return;
             }
 
-            long coins = plugin.getEconomyManager().getCoins(target.getUniqueId());
+            double coins = plugin.getEconomyManager().getCoins(target.getUniqueId());
             String message = target.equals(sender) ?
                     "&eYour balance: &a" + plugin.getEconomyManager().formatBalance(coins) :
                     "&e" + target.getName() + "'s balance: &a" + plugin.getEconomyManager().formatBalance(coins);

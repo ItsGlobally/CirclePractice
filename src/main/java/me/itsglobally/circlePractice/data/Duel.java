@@ -75,7 +75,7 @@ public class Duel {
     public PracticePlayer getOpponent(PracticePlayer player) {
         return player.equals(player1) ? player2 : player1;
     }
-
+    public int getPlayer1OrPlayer2(PracticePlayer player) {return player.equals(player1) ? 1 : 2; }
     public boolean containsPlayer(UUID uuid) {
         return player1.getUuid().equals(uuid) || player2.getUuid().equals(uuid);
     }

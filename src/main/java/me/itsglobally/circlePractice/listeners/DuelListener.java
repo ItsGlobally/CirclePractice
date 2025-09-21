@@ -1,10 +1,7 @@
 package me.itsglobally.circlePractice.listeners;
 
 import me.itsglobally.circlePractice.CirclePractice;
-import me.itsglobally.circlePractice.data.Duel;
-import me.itsglobally.circlePractice.data.Kit;
-import me.itsglobally.circlePractice.data.PracticePlayer;
-import me.itsglobally.circlePractice.data.TempData;
+import me.itsglobally.circlePractice.data.*;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -92,10 +89,18 @@ public class DuelListener implements Listener {
         PracticePlayer pp = plugin.getPlayerManager().getPlayer(p.getUniqueId());
 
         if (pp.isInDuel() && plugin.getDuelManager().getDuel(p.getUniqueId()).getState() == Duel.DuelState.STARTING) {
-            if (e.getFrom().getBlockX() != e.getTo().getBlockX() ||
-                    e.getFrom().getBlockZ() != e.getTo().getBlockZ()) {
-                e.setCancelled(true);
+            Duel duel = pp.getCurrentDuel();
+            Arena arena = duel.getArena();
+            if (duel.getPlayer1OrPlayer2(pp) == 1) {
+                if (e.getTo().getX() != arena.getPos1().getX() || e.getTo().getY() != arena.getPos1().getY()) {
+                    p.teleport(arena.getPos1());
+                }
+            } else {
+                if (e.getTo().getX() != arena.getPos2().getX() ||  e.getTo().getY() != arena.getPos2().getY()) {
+                    p.teleport(arena.getPos2());
+                }
             }
+
         }
     }
 

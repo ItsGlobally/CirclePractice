@@ -77,7 +77,6 @@ public class FileDataManager {
             data.setStars(playerData.getLong(path + ".stars", 1));
         }
 
-// Load xp
         if (playerData.contains(path + ".xp")) {
             data.setXp(playerData.getLong(path + ".xp", 0));
         }
@@ -226,24 +225,6 @@ public class FileDataManager {
             data.setXp(data.getXp() - 100);
             data.setStars(data.getStars() + 1);
         }
-    }
-
-    // --- Coins API (Delegated to EconomyManager) ---
-
-    public long getCoins(UUID uuid) {
-        return plugin.getEconomyManager().getCoins(uuid);
-    }
-
-    public void setCoins(UUID uuid, long coins) {
-        plugin.getEconomyManager().setCoins(uuid, coins);
-    }
-
-    public void addCoins(UUID uuid, long coins) {
-        plugin.getEconomyManager().addCoins(uuid, coins);
-    }
-
-    public boolean removeCoins(UUID uuid, long coins) {
-        return plugin.getEconomyManager().removeCoins(uuid, coins);
     }
 
     private void savePlayerDataFile() {

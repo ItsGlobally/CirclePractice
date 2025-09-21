@@ -4,7 +4,7 @@ main: me.itsglobally.circlePractice.CirclePractice
 api-version: 1.8
 authors: [ItsGlobally, bolt.new]
 description: Advanced PvP Practice Plugin
-depend: [ NontageLib, Vault ]
+depend: [ NontageLib, Vault, ProtocolLib  ]
 softdepend:
   - "PlaceholderAPI"
 commands:

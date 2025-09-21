@@ -1,5 +1,7 @@
 package me.itsglobally.circlePractice;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import me.itsglobally.circlePractice.data.FileDataManager;
 import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.managers.*;
@@ -31,13 +33,18 @@ public class CirclePractice extends JavaPlugin {
     private PluginManager pluginManager;
     private EconomyManager economyManager;
     private ScoreboardStatus scoreboardStatus;
-
+    private ProtocolManager protocolManager;
     public static CirclePractice getInstance() {
         return instance;
     }
 
     public static Audience audience(Player player) {
         return adventure.player(player);
+    }
+
+    @Override
+    public void onLoad() {
+        protocolManager = ProtocolLibrary.getProtocolManager();
     }
 
     @Override
@@ -86,6 +93,7 @@ public class CirclePractice extends JavaPlugin {
         pluginManager = new PluginManager(this);
         economyManager = new EconomyManager(this);
         scoreboardStatus = new ScoreboardStatus(this);
+
         TempData.setFfaCurrentSpawn(ffaManager.randomSpawn());
     }
 
@@ -141,5 +149,9 @@ public class CirclePractice extends JavaPlugin {
 
     public LuckPerms getLuckPerms() {
         return luckPerms;
+    }
+
+    public ProtocolManager getProtocolManager() {
+        return protocolManager;
     }
 }

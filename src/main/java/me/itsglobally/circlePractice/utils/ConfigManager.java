@@ -149,5 +149,9 @@ public class ConfigManager {
 
         Location spawn = new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
         player.teleport(spawn);
+        if (player.hasPermission("circlepractice.fly")) {
+            player.setAllowFlight(true);
+            player.setFlying(true);
+        }
     }
 }

@@ -81,13 +81,13 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (e.getPlayer().getLocation().getY() <= 50 && plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId()).isInSpawn()) plugin.getConfigManager().teleportToSpawn(e.getPlayer());
+        if (e.getPlayer().getLocation().getY() <= 0 && plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId()).isInSpawn()) plugin.getConfigManager().teleportToSpawn(e.getPlayer());
     }
     @EventHandler
     public void onMessage(AsyncPlayerChatEvent e) {
         e.setCancelled(true);
         Bukkit.broadcastMessage(MessageUtil.formatMessage(
-                plugin.getPlayerManager().getPrefixedName(e.getPlayer())
+                plugin.getFileDataManager().getStars(e.getPlayer().getUniqueId()) + " " + plugin.getPlayerManager().getPrefixedName(e.getPlayer())
                         + "&r » "
                         + e.getMessage()
         ));
