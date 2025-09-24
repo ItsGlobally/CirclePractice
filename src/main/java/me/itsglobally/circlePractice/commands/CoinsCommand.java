@@ -3,10 +3,13 @@ package me.itsglobally.circlePractice.commands;
 import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import top.nontage.nontagelib.annotations.CommandInfo;
 import top.nontage.nontagelib.command.NontageCommand;
+
+import java.util.List;
 
 @CommandInfo(name = "coins", description = "Manage player coins", override = true, shouldLoad = true)
 public class CoinsCommand implements NontageCommand {
@@ -139,5 +142,17 @@ public class CoinsCommand implements NontageCommand {
         } else {
             MessageUtil.sendMessage((Player) sender, "&cUsage: /coins [balance|give|take|set] [player] [amount]");
         }
+    }
+    @Override
+    public List<String> onTabComplete(CommandSender sender, String label, String[] args, Location location) {
+        if (args.length == 1) {
+            return List.of("balance", "give", "take", "set");
+        }
+        if (args.length == 2) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .toList();
+        }
+        return List.of();
     }
 }

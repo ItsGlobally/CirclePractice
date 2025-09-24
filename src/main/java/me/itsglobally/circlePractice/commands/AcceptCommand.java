@@ -17,7 +17,6 @@ public class AcceptCommand implements NontageCommand {
             sender.sendMessage("This command can only be used by players!");
             return;
         }
-
         plugin.getDuelManager().acceptDuel(player);
     }
 }

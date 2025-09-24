@@ -121,7 +121,12 @@ public class DuelManager {
             pp2.setState(PracticePlayer.PlayerState.SPAWN);
             return;
         }
-
+        for (Player op : Bukkit.getOnlinePlayers()) {
+            player1.hidePlayer(op);
+            player2.hidePlayer(op);
+            player1.showPlayer(player2);
+            player2.showPlayer(player1);
+        }
         Duel duel = new Duel(pp1, pp2, kit, arena);
         duels.put(duel.getId(), duel);
 

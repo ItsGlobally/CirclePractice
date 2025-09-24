@@ -28,9 +28,13 @@ public class DuelListener implements Listener {
 
         PracticePlayer practicePlayer = plugin.getPlayerManager().getPlayer(player);
 
+        if (practicePlayer != null && practicePlayer.isSpectating()) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (practicePlayer != null && practicePlayer.isInDuel()) {
             if (player.getHealth() - event.getFinalDamage() <= 0) {
-                EntityDamageByEntityEvent edbe = (EntityDamageByEntityEvent) event;
                 event.setCancelled(true);
 
                 player.setHealth(20.0);
@@ -54,20 +58,19 @@ public class DuelListener implements Listener {
         PracticePlayer practicePlayer = plugin.getPlayerManager().getPlayer(player);
 
         if (practicePlayer != null && practicePlayer.isInDuel()) {
-            // Cancel the death completely
             event.getEntity().spigot().respawn();
             event.setDeathMessage(null);
             event.getDrops().clear();
             event.setDroppedExp(0);
-
-            // Set player to full health to prevent death screen
-            player.setHealth(player.getMaxHealth());
+            player.setHealth(20.0);
 
             Duel duel = practicePlayer.getCurrentDuel();
             PracticePlayer winner = duel.getOpponent(practicePlayer);
+            winner.getPlayer().setHealth(20.0);
 
-            MessageUtil.sendTitle(player, "&cDEFEAT!", "");
-            MessageUtil.sendTitle(winner.getPlayer(), "&aVICTORY!", "");
+
+            MessageUtil.sendTitle(player, "&cDEFEAT!", "You have been defeated by " + winner.getName());
+            MessageUtil.sendTitle(winner.getPlayer(), "&aVICTORY!", "You have defeated " + practicePlayer.getName());
             plugin.getDuelManager().endDuel(duel, winner);
         }
     }
@@ -95,10 +98,13 @@ public class DuelListener implements Listener {
                 if (e.getTo().getX() != arena.getPos1().getX() || e.getTo().getY() != arena.getPos1().getY()) {
                     p.teleport(arena.getPos1());
                 }
-            } else {
-                if (e.getTo().getX() != arena.getPos2().getX() ||  e.getTo().getY() != arena.getPos2().getY()) {
+            } else if (duel.getPlayer1OrPlayer2(pp) == 2) {
+                if (e.getTo().getX() != arena.getPos2().getX() || e.getTo().getY() != arena.getPos2().getY()) {
                     p.teleport(arena.getPos2());
                 }
+            } else {
+                e.setCancelled(true);
+                MessageUtil.sendMessage(p, "TF UR NOT P1 OR P2 LIKE HUH");
             }
 
         }
@@ -109,11 +115,11 @@ public class DuelListener implements Listener {
     public void onPlace(BlockPlaceEvent e) {
         Player player = e.getPlayer();
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
-        if (pP.getState() == PracticePlayer.PlayerState.SPECTATING) {
+        if (pP.isSpectating()) {
             e.setCancelled(true);
             MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
         }
-        if (pP.getState() == PracticePlayer.PlayerState.DUEL) {
+        if (pP.isInDuel()) {
             Duel cD = plugin.getPlayerManager().getPlayer(player.getUniqueId()).getCurrentDuel();
             Kit k = plugin.getKitManager().getKit(cD.getKit());
             if (!k.canBuild()) {
@@ -135,11 +141,11 @@ public class DuelListener implements Listener {
     public void onBreak(BlockBreakEvent e) {
         Player player = e.getPlayer();
         PracticePlayer pP = plugin.getPlayerManager().getPlayer(player);
-        if (pP.getState() == PracticePlayer.PlayerState.SPECTATING) {
+        if (pP.isSpectating()) {
             e.setCancelled(true);
             MessageUtil.sendActionBar(player, "&cYou cannot place blocks here!");
         }
-        if (pP.getState() == PracticePlayer.PlayerState.DUEL) {
+        if (pP.isInDuel()) {
             Duel cD = plugin.getPlayerManager().getPlayer(player.getUniqueId()).getCurrentDuel();
             Kit k = plugin.getKitManager().getKit(cD.getKit());
             if (!k.canBuild()) {
@@ -155,6 +161,4 @@ public class DuelListener implements Listener {
         }
         TempData.removeBlockPlaced(e.getBlock().getLocation());
     }
-
-
 }

@@ -36,7 +36,7 @@ public class SpectateCommand implements NontageCommand {
             return;
         }
 
-        PracticePlayer tgpp = plugin.getPlayerManager().getPlayer(tg.getUniqueId());
+        PracticePlayer tgpp = plugin.getPlayerManager().getPlayer(tg);
 
         Duel match = tgpp.getCurrentDuel();
 
@@ -46,6 +46,15 @@ public class SpectateCommand implements NontageCommand {
         }
         match.getPlayer1().getPlayer().hidePlayer(p);
         match.getPlayer2().getPlayer().hidePlayer(p);
+        match.getPlayer1().getPlayer().hidePlayer(p);
+        match.getPlayer2().getPlayer().hidePlayer(p);
+        match.getPlayer1().getPlayer().hidePlayer(p);
+        match.getPlayer2().getPlayer().hidePlayer(p);
+        for (Player op : Bukkit.getOnlinePlayers()) {
+            p.hidePlayer(op);
+            p.showPlayer(match.getPlayer1().getPlayer());
+            p.showPlayer(match.getPlayer2().getPlayer());
+        }
         match.addSpectator(p.getUniqueId());
         p.teleport(match.getArena().getSpectatorSpawn());
 
@@ -53,6 +62,11 @@ public class SpectateCommand implements NontageCommand {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, String label, String[] args, Location location) {
-        return NontageCommand.super.onTabComplete(sender, label, args, location);
+        if (args.length == 1) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .toList();
+        }
+        return List.of();
     }
 }

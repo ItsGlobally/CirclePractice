@@ -4,10 +4,14 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.FileDataManager;
 import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.utils.MessageUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import top.nontage.nontagelib.annotations.CommandInfo;
 import top.nontage.nontagelib.command.NontageCommand;
+
+import java.util.List;
 
 @CommandInfo(name = "ffa", description = "?", override = true, shouldLoad = true)
 public class FFACommand implements NontageCommand {
@@ -45,5 +49,12 @@ public class FFACommand implements NontageCommand {
                 MessageUtil.sendMessage(p, "&c/ffa [join/leave/build/stats]");
             }
         }
+    }
+    @Override
+    public List<String> onTabComplete(CommandSender sender, String label, String[] args, Location location) {
+        if (args.length == 1) {
+            return List.of("join", "leave", "build", "stats");
+        }
+        return List.of();
     }
 }

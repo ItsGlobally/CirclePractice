@@ -3,11 +3,15 @@ package me.itsglobally.circlePractice.commands;
 import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.utils.MessageUtil;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import top.nontage.nontagelib.annotations.CommandInfo;
 import top.nontage.nontagelib.command.NontageCommand;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @CommandInfo(name = "kit", description = "ga", override = true, shouldLoad = true)
 public class KitCommand implements NontageCommand {
@@ -99,6 +103,15 @@ public class KitCommand implements NontageCommand {
                 }
             }
         }
-
+    }
+    @Override
+    public List<String> onTabComplete(CommandSender sender, String label, String[] args, Location location) {
+        if (args.length == 1) {
+            return List.of("editor", "load");
+        }
+        if (args.length == 2) {
+            return new ArrayList<>(plugin.getKitManager().getAllKits().keySet());
+        }
+        return List.of();
     }
 }

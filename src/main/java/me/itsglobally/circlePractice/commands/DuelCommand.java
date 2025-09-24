@@ -4,10 +4,14 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.menus.DuelMenu;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import top.nontage.nontagelib.annotations.CommandInfo;
 import top.nontage.nontagelib.command.NontageCommand;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @CommandInfo(name = "duel", description = "ga", override = true, shouldLoad = true)
 public class DuelCommand implements NontageCommand {
@@ -44,5 +48,17 @@ public class DuelCommand implements NontageCommand {
         }
 
         plugin.getDuelManager().sendDuelRequest(player, target, kit);
+    }
+    @Override
+    public List<String> onTabComplete(CommandSender sender, String label, String[] args, Location location) {
+        if (args.length == 1) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .toList();
+        }
+        if (args.length == 2) {
+            return new ArrayList<>(plugin.getKitManager().getAllKits().keySet());
+        }
+        return List.of();
     }
 }

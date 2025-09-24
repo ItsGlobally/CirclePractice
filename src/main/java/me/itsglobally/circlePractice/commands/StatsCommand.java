@@ -4,10 +4,13 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.FileDataManager;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import top.nontage.nontagelib.annotations.CommandInfo;
 import top.nontage.nontagelib.command.NontageCommand;
+
+import java.util.List;
 
 @CommandInfo(name = "stats", description = "ga", override = true, shouldLoad = true)
 public class StatsCommand implements NontageCommand {
@@ -22,7 +25,6 @@ public class StatsCommand implements NontageCommand {
         }
 
         Player target = player;
-
         if (args.length == 1) {
             target = Bukkit.getPlayer(args[0]);
             if (target == null) {
@@ -39,6 +41,14 @@ public class StatsCommand implements NontageCommand {
                     " &cLosses: " + stats.losses() +
                     " &dWin Rate: " + String.format("%.1f", stats.getWinRate()) + "%");
         }
-
+    }
+    @Override
+    public List<String> onTabComplete(CommandSender sender, String label, String[] args, Location location) {
+        if (args.length == 1) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .toList();
+        }
+        return List.of();
     }
 }

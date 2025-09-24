@@ -94,7 +94,7 @@ public class PrefixMenu {
 
         }, 17);
         inv.setItem(new ItemBuilder(Material.WOOL)
-                .setWoolColor(DyeColor.PURPLE)
+                .setWoolColor(DyeColor.GREEN)
                 .setDisplayName("&aBUILDER")
                 .setLore(List.of(pp.isPlayerInGroup("builder") ? "&aOwned!" : "&cNot owner!"))
                 .build(), clickInventoryEvent -> {
@@ -105,7 +105,7 @@ public class PrefixMenu {
 
         }, 19);
         inv.setItem(new ItemBuilder(Material.WOOL)
-                .setWoolColor(DyeColor.PURPLE)
+                .setWoolColor(DyeColor.BLUE)
                 .setDisplayName("&1MOD")
                 .setLore(List.of(pp.isPlayerInGroup("mod") ? "&aOwned!" : "&cNot owner!"))
                 .build(), clickInventoryEvent -> {
@@ -116,7 +116,7 @@ public class PrefixMenu {
 
         }, 21);
         inv.setItem(new ItemBuilder(Material.WOOL)
-                .setWoolColor(DyeColor.PURPLE)
+                .setWoolColor(DyeColor.LIGHT_BLUE)
                 .setDisplayName("&bADMIN")
                 .setLore(List.of(pp.isPlayerInGroup("admin") ? "&aOwned!" : "&cNot owner!"))
                 .build(), clickInventoryEvent -> {
