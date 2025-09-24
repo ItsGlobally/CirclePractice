@@ -84,14 +84,14 @@ public class PlayerListener implements Listener {
         if (e.getPlayer().getLocation().getY() <= 0 && plugin.getPlayerManager().getPlayer(e.getPlayer().getUniqueId()).isInSpawn()) plugin.getConfigManager().teleportToSpawn(e.getPlayer());
     }
     @EventHandler
-    public void onMessage(PlayerChatEvent e) {
-        e.setCancelled(true);
-        Bukkit.broadcastMessage(MessageUtil.formatMessage(
-                plugin.getFileDataManager().getStars(e.getPlayer().getUniqueId()) + " " + plugin.getPlayerManager().getPrefixedName(e.getPlayer())
-                        + "&r » "
-                        + e.getMessage()
+    public void onMessage(AsyncPlayerChatEvent e) {
+        e.setFormat(MessageUtil.formatMessage(
+                plugin.getFileDataManager().getStars(e.getPlayer().getUniqueId()) + " " +
+                        plugin.getPlayerManager().getPrefixedName(e.getPlayer()) +
+                        "&r » %2$s"
         ));
     }
+
 
     @EventHandler
     public void onHungry(FoodLevelChangeEvent e) {
