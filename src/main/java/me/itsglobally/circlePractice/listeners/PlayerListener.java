@@ -4,6 +4,7 @@ import me.itsglobally.circlePractice.CirclePractice;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.data.TempData;
 import me.itsglobally.circlePractice.utils.MessageUtil;
+import me.itsglobally.circlePractice.utils.StarUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
@@ -86,7 +87,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onMessage(AsyncPlayerChatEvent e) {
         e.setFormat(MessageUtil.formatMessage(
-                plugin.getFileDataManager().getStars(e.getPlayer().getUniqueId()) + " " +
+                StarUtil.getColoredStars(plugin.getFileDataManager().getStars(e.getPlayer().getUniqueId())) + " " +
                         plugin.getPlayerManager().getPrefixedName(e.getPlayer()) +
                         "&r » %2$s"
         ));

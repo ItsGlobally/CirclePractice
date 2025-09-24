@@ -124,9 +124,11 @@ public class DuelManager {
         for (Player op : Bukkit.getOnlinePlayers()) {
             player1.hidePlayer(op);
             player2.hidePlayer(op);
-            player1.showPlayer(player2);
-            player2.showPlayer(player1);
         }
+        player1.showPlayer(player2);
+        player2.showPlayer(player1);
+        player1.showPlayer(player2);
+        player2.showPlayer(player1);
         Duel duel = new Duel(pp1, pp2, kit, arena);
         duels.put(duel.getId(), duel);
 
@@ -217,14 +219,14 @@ public class DuelManager {
 
             duel.getPlayer1().restoreInventory();
             for (UUID u : duel.getSpectators()) {
-                if (Bukkit.getPlayer(u) != null) p1.showPlayer(Bukkit.getPlayer(u));
+                if (Bukkit.getPlayer(u) != null && plugin.getPlayerManager().getPlayer(u).isInSpawnIncludeQueuing()) p1.showPlayer(Bukkit.getPlayer(u));
             }
         }
         if (p2 != null) {
             plugin.getConfigManager().teleportToSpawn(p2);
             duel.getPlayer2().restoreInventory();
             for (UUID u : duel.getSpectators()) {
-                if (Bukkit.getPlayer(u) != null) p2.showPlayer(Bukkit.getPlayer(u));
+                if (Bukkit.getPlayer(u) != null && plugin.getPlayerManager().getPlayer(u).isInSpawnIncludeQueuing()) p2.showPlayer(Bukkit.getPlayer(u));
             }
         }
 

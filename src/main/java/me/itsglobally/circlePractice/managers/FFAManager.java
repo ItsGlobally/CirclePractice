@@ -49,6 +49,7 @@ public record FFAManager(CirclePractice plugin) {
             }
         } catch (IllegalStateException e) {
             leaveFFA(p);
+            MessageUtil.sendMessage(p, "&cNo map available");
             return;
         }
         p.getInventory().clear();

@@ -1,6 +1,7 @@
 package me.itsglobally.circlePractice.commands;
 
 import me.itsglobally.circlePractice.CirclePractice;
+import me.itsglobally.circlePractice.data.Kit;
 import me.itsglobally.circlePractice.data.PracticePlayer;
 import me.itsglobally.circlePractice.utils.MessageUtil;
 import org.bukkit.Location;
@@ -110,7 +111,11 @@ public class KitCommand implements NontageCommand {
             return List.of("editor", "load");
         }
         if (args.length == 2) {
-            return new ArrayList<>(plugin.getKitManager().getAllKits().keySet());
+            List<String> kitNames = new ArrayList<>();
+            for (Kit kit : plugin.getKitManager().getAllKits().values()) {
+                if (kit.isEnabled()) kitNames.add(kit.getName());
+            }
+            return kitNames;
         }
         return List.of();
     }

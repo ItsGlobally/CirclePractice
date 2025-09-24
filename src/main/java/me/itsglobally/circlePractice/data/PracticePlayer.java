@@ -137,6 +137,7 @@ public class PracticePlayer {
         return state == PlayerState.SPAWN || state == PlayerState.EDITING || state == PlayerState.QUEUE;
     }
 
+
     public enum PlayerState {
         SPAWN, QUEUE, DUEL, SPECTATING, EDITING, FFA
     }
