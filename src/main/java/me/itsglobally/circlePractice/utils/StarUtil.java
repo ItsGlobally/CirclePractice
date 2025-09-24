@@ -22,11 +22,11 @@ public final class StarUtil {
         String number = formatNumber(stars);
 
         if (stars >= 1000) {
-            return rainbowize( number + "★" );
+            return rainbowize( number + "✫" );
         } else {
             // 取得對應顏色
             ChatColor color = prestigeColor(stars);
-            return color + number + color + "★" + ChatColor.RESET;
+            return color + number + color + "✫" + ChatColor.RESET;
         }
     }
 

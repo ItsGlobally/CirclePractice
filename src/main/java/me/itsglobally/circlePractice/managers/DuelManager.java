@@ -10,9 +10,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class DuelManager {
 
@@ -21,18 +19,22 @@ public class DuelManager {
     private final Map<UUID, UUID> duelRequests; // requester -> target
     private final Map<UUID, String> duelRequestsKit;
 
+    // 新增：存每個玩家 Duel 可見的玩家
+    private final Map<UUID, Set<UUID>> duelVisible;
+
     public DuelManager(CirclePractice plugin) {
         this.plugin = plugin;
         this.duelRequestsKit = new HashMap<>();
         this.duels = new HashMap<>();
         this.duelRequests = new HashMap<>();
+        this.duelVisible = new HashMap<>();
     }
 
     public void sendDuelRequest(Player requester, Player target, String kit) {
         UUID requesterUuid = requester.getUniqueId();
-        PracticePlayer PP = plugin.getPlayerManager().getPlayer(requesterUuid);
+        PracticePlayer pp = plugin.getPlayerManager().getPlayer(requesterUuid);
 
-        if (PP.getState() != PracticePlayer.PlayerState.SPAWN) {
+        if (pp.getState() != PracticePlayer.PlayerState.SPAWN) {
             MessageUtil.sendActionBar(requester, "&cYou are not in the spawn!");
             requester.playSound(requester.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0f, 1.0f);
             duelRequests.remove(requesterUuid);
@@ -40,14 +42,14 @@ public class DuelManager {
         }
 
         UUID targetUuid = target.getUniqueId();
-
         duelRequests.put(requesterUuid, targetUuid);
         duelRequestsKit.put(requesterUuid, kit);
+
         MessageUtil.sendMessage(requester, "&aYou sent a duel request to &e" + target.getName() + " &afor kit &e" + kit);
         MessageUtil.sendMessage(target, "&e" + requester.getName() + " &ahas sent you a duel request for kit &e" + kit);
         MessageUtil.sendMessage(target, "&aType &e/accept &ato accept the duel!");
 
-        // Remove request after 30 seconds
+        // 自動過期
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (duelRequests.get(requesterUuid) != null && duelRequests.get(requesterUuid).equals(targetUuid)) {
                 duelRequests.remove(requesterUuid);
@@ -56,14 +58,13 @@ public class DuelManager {
                     MessageUtil.sendMessage(target, "&cThe duel request from " + requester.getName() + " has expired.");
                 }
             }
-        }, 600L); // 30 seconds
+        }, 600L);
     }
 
     public void acceptDuel(Player accepter) {
         UUID accepterUuid = accepter.getUniqueId();
         UUID requesterUuid = null;
 
-        // Find the requester
         for (Map.Entry<UUID, UUID> entry : duelRequests.entrySet()) {
             if (entry.getValue().equals(accepterUuid)) {
                 requesterUuid = entry.getKey();
@@ -83,28 +84,23 @@ public class DuelManager {
             return;
         }
 
-        PracticePlayer PP = plugin.getPlayerManager().getPlayer(requesterUuid);
-
-        if (PP.getState() != PracticePlayer.PlayerState.SPAWN) {
+        PracticePlayer pp = plugin.getPlayerManager().getPlayer(requesterUuid);
+        if (pp.getState() != PracticePlayer.PlayerState.SPAWN) {
             MessageUtil.sendMessage(accepter, "&cThe player is not in the spawn!");
             accepter.playSound(accepter.getLocation(), Sound.ENDERMAN_TELEPORT, 1.0f, 1.0f);
             duelRequests.remove(requesterUuid);
             return;
         }
 
-        // Remove the request
         duelRequests.remove(requesterUuid);
-
-        // Start the duel
         startDuel(requester, accepter, duelRequestsKit.get(requesterUuid));
     }
 
     public void startDuel(Player player1, Player player2, String kit) {
         PracticePlayer pp1 = plugin.getPlayerManager().getPlayer(player1);
         PracticePlayer pp2 = plugin.getPlayerManager().getPlayer(player2);
-        // Check if players are available
-        if (pp1.getState() != PracticePlayer.PlayerState.SPAWN ||
-                pp2.getState() != PracticePlayer.PlayerState.SPAWN) {
+
+        if (pp1.getState() != PracticePlayer.PlayerState.SPAWN || pp2.getState() != PracticePlayer.PlayerState.SPAWN) {
             MessageUtil.sendMessage(player1, "&cOne of the players is not available for a duel!");
             MessageUtil.sendMessage(player2, "&cOne of the players is not available for a duel!");
             pp1.setState(PracticePlayer.PlayerState.SPAWN);
@@ -112,7 +108,6 @@ public class DuelManager {
             return;
         }
 
-        // Get available arena
         Arena arena = plugin.getArenaManager().getAvailableArena(kit);
         if (arena == null) {
             MessageUtil.sendMessage(player1, "&cNo arenas are available right now!");
@@ -121,14 +116,8 @@ public class DuelManager {
             pp2.setState(PracticePlayer.PlayerState.SPAWN);
             return;
         }
-        for (Player op : Bukkit.getOnlinePlayers()) {
-            player1.hidePlayer(op);
-            player2.hidePlayer(op);
-        }
-        player1.showPlayer(player2);
-        player2.showPlayer(player1);
-        player1.showPlayer(player2);
-        player2.showPlayer(player1);
+
+        // 創建 Duel
         Duel duel = new Duel(pp1, pp2, kit, arena);
         duels.put(duel.getId(), duel);
 
@@ -136,7 +125,6 @@ public class DuelManager {
         pp2.setState(PracticePlayer.PlayerState.DUEL);
         pp1.setCurrentDuel(duel);
         pp2.setCurrentDuel(duel);
-
         arena.setInUse(true);
 
         pp1.saveInventory();
@@ -148,13 +136,36 @@ public class DuelManager {
         player1.setFlying(false);
         player2.setAllowFlight(false);
         player2.setFlying(false);
-        player1.showPlayer(player2);
-        player2.showPlayer(player1);
 
         plugin.getKitManager().applyKit(player1, kit);
         plugin.getKitManager().applyKit(player2, kit);
 
+        // 設定 Duel 可見性
+        setupDuelVisibility(duel);
+
         startCountdown(duel);
+    }
+
+    private void setupDuelVisibility(Duel duel) {
+        Player p1 = Bukkit.getPlayer(duel.getPlayer1().getUuid());
+        Player p2 = Bukkit.getPlayer(duel.getPlayer2().getUuid());
+        if (p1 == null || p2 == null) return;
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                if (!online.equals(p1) && !online.equals(p2)) {
+                    online.hidePlayer(p1);
+                    online.hidePlayer(p2);
+                    p1.hidePlayer(online);
+                    p2.hidePlayer(online);
+                }
+            }
+            p1.showPlayer(p2);
+            p2.showPlayer(p1);
+
+            duelVisible.put(p1.getUniqueId(), Set.of(p2.getUniqueId()));
+            duelVisible.put(p2.getUniqueId(), Set.of(p1.getUniqueId()));
+        }, 1L);
     }
 
     private void startCountdown(Duel duel) {
@@ -168,18 +179,7 @@ public class DuelManager {
 
                 Player p1 = Bukkit.getPlayer(duel.getPlayer1().getUuid());
                 Player p2 = Bukkit.getPlayer(duel.getPlayer2().getUuid());
-
-
-                p1.playSound(p1.getLocation(), Sound.CLICK, 1.0f, 1.0f);
-                p2.playSound(p2.getLocation(), Sound.CLICK, 1.0f, 1.0f);
-
-                if (p1 == null) {
-                    endDuel(duel, duel.getOpponent(plugin.getPlayerManager().getPlayer(p2.getUniqueId())));
-                    cancel();
-                    return;
-                }
-                if (p2 == null) {
-                    endDuel(duel, duel.getOpponent(plugin.getPlayerManager().getPlayer(p1.getUniqueId())));
+                if (p1 == null || p2 == null) {
                     cancel();
                     return;
                 }
@@ -188,6 +188,8 @@ public class DuelManager {
                 if (countdown > 0) {
                     MessageUtil.sendMessage(p1, "&eDuel starting in &c" + countdown + "&e...");
                     MessageUtil.sendMessage(p2, "&eDuel starting in &c" + countdown + "&e...");
+                    p1.playSound(p1.getLocation(), Sound.CLICK, 1.0f, 1.0f);
+                    p2.playSound(p2.getLocation(), Sound.CLICK, 1.0f, 1.0f);
                     duel.setCountdown(countdown - 1);
                 } else {
                     MessageUtil.sendMessage(p1, "&aFight!");
@@ -214,30 +216,27 @@ public class DuelManager {
 
         duel.getArena().setInUse(false);
 
+        // 恢復 Spawn 可見性
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (p1 != null) online.showPlayer(p1);
+            if (p2 != null) online.showPlayer(p2);
+            if (p1 != null) p1.showPlayer(online);
+            if (p2 != null) p2.showPlayer(online);
+        }
+
+        duelVisible.remove(p1 != null ? p1.getUniqueId() : null);
+        duelVisible.remove(p2 != null ? p2.getUniqueId() : null);
+
         if (p1 != null) {
             plugin.getConfigManager().teleportToSpawn(p1);
-
             duel.getPlayer1().restoreInventory();
-            for (UUID u : duel.getSpectators()) {
-                if (Bukkit.getPlayer(u) != null && plugin.getPlayerManager().getPlayer(u).isInSpawnIncludeQueuing()) p1.showPlayer(Bukkit.getPlayer(u));
-            }
         }
         if (p2 != null) {
             plugin.getConfigManager().teleportToSpawn(p2);
             duel.getPlayer2().restoreInventory();
-            for (UUID u : duel.getSpectators()) {
-                if (Bukkit.getPlayer(u) != null && plugin.getPlayerManager().getPlayer(u).isInSpawnIncludeQueuing()) p2.showPlayer(Bukkit.getPlayer(u));
-            }
         }
 
         if (winner != null) {
-            String winnerName = winner.getName();
-            String loserName = duel.getOpponent(winner).getName();
-            String message = "&f-------------------------\n&bWinner: &f" + winnerName + "&r | &cLoser: &f" + loserName + "&r\n&f-------------------------";
-            if (p1 != null) MessageUtil.sendMessage(p1, message);
-            if (p2 != null) MessageUtil.sendMessage(p2, message);
-
-
             Player winnerPlayer = Bukkit.getPlayer(winner.getUuid());
             if (winnerPlayer != null) {
                 plugin.getEconomyManager().rewardWin(winnerPlayer, duel.getKit());
@@ -246,6 +245,10 @@ public class DuelManager {
             }
             plugin.getFileDataManager().updatePlayerStats(winner.getUuid(), duel.getKit(), true);
             plugin.getFileDataManager().updatePlayerStats(duel.getOpponent(winner).getUuid(), duel.getKit(), false);
+
+            String message = "&f-------------------------\n&bWinner: &f" + winner.getName() + "&r | &cLoser: &f" + duel.getOpponent(winner).getName() + "&r\n&f-------------------------";
+            if (p1 != null) MessageUtil.sendMessage(p1, message);
+            if (p2 != null) MessageUtil.sendMessage(p2, message);
         }
 
         duels.remove(duel.getId());
@@ -253,9 +256,7 @@ public class DuelManager {
 
     public Duel getDuel(UUID playerId) {
         for (Duel duel : duels.values()) {
-            if (duel.containsPlayer(playerId)) {
-                return duel;
-            }
+            if (duel.containsPlayer(playerId)) return duel;
         }
         return null;
     }
