@@ -151,6 +151,92 @@ public class DuelManager {
         Player p2 = Bukkit.getPlayer(duel.getPlayer2().getUuid());
         if (p1 == null || p2 == null) return;
 
+        // Hide all other players from duel participants immediately
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (!online.equals(p1) && !online.equals(p2)) {
+                // Hide duel players from other players
+                online.hidePlayer(p1);
+                online.hidePlayer(p2);
+                // Hide other players from duel participants
+                p1.hidePlayer(online);
+                p2.hidePlayer(online);
+            }
+        }
+        
+        // Ensure duel participants can see each other
+        p1.showPlayer(p2);
+        p2.showPlayer(p1);
+
+        // Store visibility info
+        duelVisible.put(p1.getUniqueId(), Set.of(p2.getUniqueId()));
+        duelVisible.put(p2.getUniqueId(), Set.of(p1.getUniqueId()));
+        
+        // Double-check visibility after a short delay to ensure it's properly set
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Player player1 = Bukkit.getPlayer(duel.getPlayer1().getUuid());
+            Player player2 = Bukkit.getPlayer(duel.getPlayer2().getUuid());
+            if (player1 == null || player2 == null) return;
+            
+            // Ensure they can still see each other
+            player1.showPlayer(player2);
+            player2.showPlayer(player1);
+        }, 10L);
+    }
+
+    private void restoreDuelVisibility(Duel duel) {
+        Player p1 = Bukkit.getPlayer(duel.getPlayer1().getUuid());
+        Player p2 = Bukkit.getPlayer(duel.getPlayer2().getUuid());
+
+        // Clean up visibility tracking
+        if (p1 != null) duelVisible.remove(p1.getUniqueId());
+        if (p2 != null) duelVisible.remove(p2.getUniqueId());
+
+        // Restore visibility for all players
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (p1 != null) {
+                online.showPlayer(p1);
+                // Only show other players to p1 if they're in spawn/queue
+                PracticePlayer pp1 = plugin.getPlayerManager().getPlayer(p1);
+                if (pp1 != null && pp1.isInSpawnIncludeQueuing()) {
+                    p1.showPlayer(online);
+                }
+            }
+            if (p2 != null) {
+                online.showPlayer(p2);
+                // Only show other players to p2 if they're in spawn/queue
+                PracticePlayer pp2 = plugin.getPlayerManager().getPlayer(p2);
+                if (pp2 != null && pp2.isInSpawnIncludeQueuing()) {
+                    p2.showPlayer(online);
+                }
+            }
+        }
+    }
+
+    // Add method to handle new player joins during duels
+    public void handlePlayerJoin(Player newPlayer) {
+        // Hide all duel participants from the new player and vice versa
+        for (Duel duel : duels.values()) {
+            if (duel.getState() != Duel.DuelState.FINISHED) {
+                Player p1 = Bukkit.getPlayer(duel.getPlayer1().getUuid());
+                Player p2 = Bukkit.getPlayer(duel.getPlayer2().getUuid());
+                
+                if (p1 != null) {
+                    newPlayer.hidePlayer(p1);
+                    p1.hidePlayer(newPlayer);
+                }
+                if (p2 != null) {
+                    newPlayer.hidePlayer(p2);
+                    p2.hidePlayer(newPlayer);
+                }
+            }
+        }
+    }
+
+    private void setupDuelVisibilityOld(Duel duel) {
+        Player p1 = Bukkit.getPlayer(duel.getPlayer1().getUuid());
+        Player p2 = Bukkit.getPlayer(duel.getPlayer2().getUuid());
+        if (p1 == null || p2 == null) return;
+
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 if (!online.equals(p1) && !online.equals(p2)) {
@@ -216,15 +302,7 @@ public class DuelManager {
 
         duel.getArena().setInUse(false);
 
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            if (p1 != null) online.showPlayer(p1);
-            if (p2 != null) online.showPlayer(p2);
-            if (p1 != null && plugin.getPlayerManager().getPlayer(online).isInSpawnIncludeQueuing()) p1.showPlayer(online);
-            if (p2 != null && plugin.getPlayerManager().getPlayer(online).isInSpawnIncludeQueuing()) p2.showPlayer(online);
-        }
-
-        duelVisible.remove(p1 != null ? p1.getUniqueId() : null);
-        duelVisible.remove(p2 != null ? p2.getUniqueId() : null);
+        restoreDuelVisibility(duel);
 
         if (p1 != null) {
             plugin.getConfigManager().teleportToSpawn(p1);

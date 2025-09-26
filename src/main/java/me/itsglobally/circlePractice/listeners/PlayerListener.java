@@ -54,6 +54,10 @@ public class PlayerListener implements Listener {
         }
         plugin.getConfigManager().teleportToSpawn(player);
         plugin.getPlayerManager().addPlayer(player);
+        
+        // Handle visibility for ongoing duels
+        plugin.getDuelManager().handlePlayerJoin(player);
+        
         MessageUtil.sendTitle(player, "&cThis server is still in DEVELOPMENT!", "&aFeel free to report any bugs!");
     }
 
