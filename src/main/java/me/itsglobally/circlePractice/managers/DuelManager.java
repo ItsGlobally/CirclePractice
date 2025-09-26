@@ -165,7 +165,7 @@ public class DuelManager {
 
             duelVisible.put(p1.getUniqueId(), Set.of(p2.getUniqueId()));
             duelVisible.put(p2.getUniqueId(), Set.of(p1.getUniqueId()));
-        }, 1L);
+        }, 5L);
     }
 
     private void startCountdown(Duel duel) {
