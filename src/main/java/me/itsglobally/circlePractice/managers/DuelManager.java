@@ -216,12 +216,11 @@ public class DuelManager {
 
         duel.getArena().setInUse(false);
 
-        // 恢復 Spawn 可見性
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (p1 != null) online.showPlayer(p1);
             if (p2 != null) online.showPlayer(p2);
-            if (p1 != null) p1.showPlayer(online);
-            if (p2 != null) p2.showPlayer(online);
+            if (p1 != null && plugin.getPlayerManager().getPlayer(online).isInSpawnIncludeQueuing()) p1.showPlayer(online);
+            if (p2 != null && plugin.getPlayerManager().getPlayer(online).isInSpawnIncludeQueuing()) p2.showPlayer(online);
         }
 
         duelVisible.remove(p1 != null ? p1.getUniqueId() : null);
