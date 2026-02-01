@@ -2,3 +2,6 @@ name: CirclePractice
 version: '1.0-SNAPSHOT'
 main: top.circlenetwork.circlePractice.CirclePractice
 api-version: '1.18'
+permissions:
+  circlepractice.kit:
+    default: op
