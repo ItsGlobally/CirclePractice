@@ -18,7 +18,7 @@ public class GameHandler implements Global {
     public static Game startGame(HashMap<UUID, PracticePlayer> red, HashMap<UUID, PracticePlayer> blue, Kit kit) {
         GameArena arena = GameArena.createGameArena(kit);
         if (arena == null) return null;
-        Game ng = new Game(kit, arena, red, blue);
+        Game ng = new Game(kit, arena, red, blue, red, blue);
         for (PracticePlayer practicePlayer : ng.getRed().values()) {
             Player player = practicePlayer.getPlayer();
             player.setHealth(20);

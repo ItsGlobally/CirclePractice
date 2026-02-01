@@ -16,8 +16,8 @@ public class Game {
     private final GameArena gameArena;
     private final GameHandler gameHandler = new GameHandler(this);
     private final HashMap<UUID, PracticePlayer> red, blue;
-    private final HashMap<UUID, PracticePlayer> allRed = red;
-    private final HashMap<UUID, PracticePlayer> allBlue = blue;
+    private final HashMap<UUID, PracticePlayer> allRed;
+    private final HashMap<UUID, PracticePlayer> allBlue;
     private final HashMap<UUID, UUID> lasthit = new HashMap<>();
     private final HashMap<UUID, Boolean> respawnable = new HashMap<>();
 

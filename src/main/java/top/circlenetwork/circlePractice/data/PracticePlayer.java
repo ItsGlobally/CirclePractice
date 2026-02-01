@@ -51,15 +51,17 @@ public class PracticePlayer implements Global {
     private String queuedKit;
 
     @Getter
-    @Setter
-    private String displayName = player.getName();
+    private final PlayerData playerData;
 
-    @Getter
-    private final PlayerData playerData = new PlayerData(player.getUniqueId());
-
+    public PracticePlayer(Player player) {
+        this.player = player;
+        this.playerData = new PlayerData(player.getUniqueId());
+    }
     @Getter
     @Setter
     private Game currentGame;
+
+
 
     public UUID getUuid() {
         return player.getUniqueId();
@@ -69,8 +71,8 @@ public class PracticePlayer implements Global {
         return player.getName();
     }
 
-    public String getPrefixedDisplayName() {
-        return LuckPermsUtil.getPrefix(player) + getDisplayName();
+    public String getPrefixedName() {
+        return LuckPermsUtil.getPrefix(player) + getName();
     }
 
     /* ================= state ================= */
