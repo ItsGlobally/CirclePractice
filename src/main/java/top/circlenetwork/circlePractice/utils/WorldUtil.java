@@ -1,7 +1,6 @@
 package top.circlenetwork.circlePractice.utils;
 
 import com.grinderwolf.swm.api.SlimePlugin;
-import com.grinderwolf.swm.api.exceptions.WorldAlreadyExistsException;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.world.SlimeWorld;
 import com.grinderwolf.swm.api.world.properties.SlimeProperties;
@@ -21,6 +20,7 @@ public class WorldUtil implements Global {
         props.setString(SlimeProperties.DIFFICULTY, "hard");
         return props;
     }
+
     public static void cloneArena(Arena arena, String newWorldName) {
         if (arena == null || newWorldName == null || newWorldName.isEmpty()) {
             Bukkit.getLogger().warning("Cannot clone arena: invalid parameters");

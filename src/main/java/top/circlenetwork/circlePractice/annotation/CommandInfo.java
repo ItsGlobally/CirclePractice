@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface CommandInfo {
     String name();
+
     String[] aliases() default {};
+
     String permission() default "";
 }

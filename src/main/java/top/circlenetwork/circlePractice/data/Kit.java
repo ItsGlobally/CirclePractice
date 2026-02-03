@@ -5,22 +5,64 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import top.circlenetwork.circlePractice.utils.FileUtil;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @ToString
 public class Kit {
-    @Getter
     private static final Map<String, Kit> kits = new HashMap<>();
+    private final String name;
+    private final YamlFile sourceYml;
+    private final FileConfiguration source;
+    private final EnumMap<KitOption, Object> optionCache = new EnumMap<>(KitOption.class);
+    private final List<Material> allowedBreakBlocksAroundBed = new ArrayList<>();
+
+    // instance
+    @Setter
+    private ItemStack[] inventory;
+    @Setter
+    private ItemStack[] armor;
+    public Kit(String name) {
+        this.name = name;
+        this.inventory = new ItemStack[36];
+        this.armor = new ItemStack[4];
+        this.sourceYml = new YamlFile("kits/" + name + ".yml");
+        this.source = sourceYml.getConfig();
+
+        for (KitOption option : KitOption.values()) {
+            Object value = source.contains(option.getPath())
+                    ? source.get(option.getPath())
+                    : option.getDefaultValue();
+
+            if (!option.getDefaultValue().getClass().isInstance(value)) {
+                Bukkit.getLogger().warning(
+                        "[Kit] Invalid type for " + name + "." + option.getPath()
+                );
+                value = option.getDefaultValue();
+            }
+
+            if (source.contains("allowedBreakBlocksAroundBed")) {
+                try {
+                    for (String block : source.getStringList("allowedBreakBlocksAroundBed")) {
+                        Material material = Material.valueOf(block);
+                        allowedBreakBlocksAroundBed.add(material);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            optionCache.put(option, value);
+        }
+
+
+        kits.put(name, this);
+    }
 
     public static void loadAll() {
         Map<String, YamlFile> all = FileUtil.loadYamlFolder("kits");
@@ -28,6 +70,13 @@ public class Kit {
             loadFromYml(entry.getValue().getConfig(), entry.getKey());
         }
     }
+
+    public static void saveAll() {
+        for (Kit kit : kits.values()) {
+            kit.save();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static Kit loadFromYml(FileConfiguration cfg, String name) {
 
@@ -50,53 +99,24 @@ public class Kit {
         return kit;
     }
 
-
     public static Kit getKit(String name) {
         return kits.get(name);
-    }
-
-    // instance
-
-    private final String name;
-    private final YamlFile sourceYml;
-    private final FileConfiguration source;
-    @Setter
-    private ItemStack[] inventory;
-    @Setter
-    private ItemStack[] armor;
-    private final EnumMap<KitOption, Object> optionCache = new EnumMap<>(KitOption.class);
-
-    public Kit(String name) {
-        this.name = name;
-        this.inventory = new ItemStack[36];
-        this.armor = new ItemStack[4];
-        this.sourceYml = new YamlFile("kits/" + name + ".yml");
-        this.source = sourceYml.getConfig();
-
-        for (KitOption option : KitOption.values()) {
-            Object value = source.contains(option.getPath())
-                    ? source.get(option.getPath())
-                    : option.getDefaultValue();
-
-            if (!option.getDefaultValue().getClass().isInstance(value)) {
-                Bukkit.getLogger().warning(
-                        "[Kit] Invalid type for " + name + "." + option.getPath()
-                );
-                value = option.getDefaultValue();
-            }
-
-            optionCache.put(option, value);
-        }
-
-
-        kits.put(name, this);
     }
 
     public void save() {
         source.set("inventory", inventory);
         source.set("armor", armor);
+        for (Map.Entry<Kit.KitOption, Object> entry : optionCache.entrySet()) {
+            source.set(entry.getKey().getPath(), entry.getValue());
+        }
+        List<String> saveableAllowedBreakBlocksAroundBed = new ArrayList<>();
+        for (Material material : allowedBreakBlocksAroundBed) {
+            saveableAllowedBreakBlocksAroundBed.add(material.name());
+        }
+        source.set("allowedBreakBlocksAroundBed", saveableAllowedBreakBlocksAroundBed);
         sourceYml.save();
     }
+
     public boolean getBoolean(KitOption option) {
         return (boolean) optionCache.get(option);
     }

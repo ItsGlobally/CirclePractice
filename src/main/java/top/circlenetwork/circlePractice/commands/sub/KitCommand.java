@@ -1,8 +1,10 @@
 package top.circlenetwork.circlePractice.commands.sub;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import top.circlenetwork.circlePractice.annotation.CommandInfo;
 import top.circlenetwork.circlePractice.commands.CommandBase;
+import top.circlenetwork.circlePractice.data.Arena;
 import top.circlenetwork.circlePractice.data.Kit;
 import top.circlenetwork.circlePractice.data.PracticePlayer;
 import top.circlenetwork.circlePractice.utils.Msg;
@@ -11,14 +13,18 @@ import top.circlenetwork.circlePractice.utils.Msg;
 public class KitCommand extends CommandBase {
     @Override
     public void playerExecute(Player player, String label, String[] args) {
-        if (args.length < 2) {
-            Msg.send(player, "&c用法: /kit <副指令> <值>");
+        if (args.length < 1) {
+            Msg.send(player, "&c用法: /kit <副指令>");
         }
         String cmd = args[0];
-        String value = args[1];
+
 
         switch (cmd) {
             case "create" -> {
+                if (args.length < 2) {
+                    Msg.send(player, "&c用法: /kit create <名字>");
+                }
+                String value = args[1];
                 if (Kit.getKit(value) != null) {
                     Msg.send(player, "該模式已存在!");
                     return;
@@ -28,7 +34,7 @@ public class KitCommand extends CommandBase {
             }
             case "set" -> {
                 if (args.length < 4) {
-                    Msg.send(player, "&c用法: /kit set <模式> <選項> <>");
+                    Msg.send(player, "&c用法: /kit set <模式> <選項> <值>");
                     return;
                 }
 
@@ -75,7 +81,70 @@ public class KitCommand extends CommandBase {
                 }
             }
 
+            case "allowedBreakBlocksAroundBed" -> {
+                if (args.length < 3) {
+                    Msg.send(player, "&c用法: /arena allowedBreakBlocksAroundBed <add/remove>");
+                    return;
+                }
+                switch(args[1]) {
+                    case "add" -> {
+                        if (args.length < 4) {
+                            Msg.send(player, "&c用法: /arena allowedBreakBlocksAroundBed add <模式> <方塊>");
+                            return;
+                        }
+
+                        Kit kit = Kit.getKit(args[2]);
+                        if (kit == null) {
+                            Msg.send(player, "&c該模式不存在!");
+                            return;
+                        }
+
+                        try {
+                            Material target = Material.valueOf(args[3]);
+                            if (kit.getAllowedBreakBlocksAroundBed().contains(target)) {
+                                Msg.send(player, "&c該方塊已在名單內!");
+                            }
+                            kit.getAllowedBreakBlocksAroundBed().add(target);
+                            Msg.send(player, "&a已將該方塊加入名單");
+                        } catch (IllegalArgumentException e) {
+                            Msg.send(player, "&c方塊不存在");
+                            e.printStackTrace();
+                        }
+
+                    }
+                    case "remove" -> {
+                        if (args.length < 4) {
+                            Msg.send(player, "&c用法: /arena allowedBreakBlocksAroundBed remove <模式> <方塊>");
+                            return;
+                        }
+                        Kit kit = Kit.getKit(args[2]);
+                        if (kit == null) {
+                            Msg.send(player, "&c該模式不存在!");
+                            return;
+                        }
+
+                        try {
+                            Material target = Material.valueOf(args[3]);
+                            if (!kit.getAllowedBreakBlocksAroundBed().contains(target)) {
+                                Msg.send(player, "&c該方塊不在名單內!");
+                            }
+                            kit.getAllowedBreakBlocksAroundBed().remove(target);
+                            Msg.send(player, "&a已將該方塊移出名單");
+                        } catch (IllegalArgumentException e) {
+                            Msg.send(player, "&c方塊不存在");
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+
+            }
+
             case "edit" -> {
+                if (args.length < 2) {
+                    Msg.send(player, "&c用法: /kit edit <名字>");
+                }
+                String value = args[1];
                 Kit kit = Kit.getKit(value);
                 if (kit == null) {
                     Msg.send(player, "&c該模式不存在!");
@@ -92,7 +161,7 @@ public class KitCommand extends CommandBase {
                 player.getInventory().setContents(kit.getInventory());
                 player.getInventory().setArmorContents(kit.getArmor());
 
-                Msg.send(player, "&c你現在正在編輯模式" + kit.getName() + "的排版, 使用/kit save來儲存");
+                Msg.send(player, "&a你現在正在編輯模式" + kit.getName() + "的排版, 使用/kit save來儲存");
             }
 
             case "save" -> {

@@ -6,12 +6,20 @@ import org.bukkit.World;
 import top.circlenetwork.circlePractice.utils.RandomUtils;
 import top.circlenetwork.circlePractice.utils.WorldUtil;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 public record GameArena(Location redSpawn, Location blueSpawn, Location redBed, Location blueBed, Arena arena,
                         Kit kit) {
     public static GameArena createGameArena(Kit kit) {
-        Arena chosen = RandomUtils.randomElement(Arena.getArenas().values());
+        Collection<Arena> allowed = new ArrayList<>();
+
+        for (Arena arena1 : Arena.getArenas().values()) {
+            if (arena1.getAllowedKits().contains(kit.getName())) allowed.add(arena1);
+        }
+
+        Arena chosen = RandomUtils.randomElement(allowed);
 
         if (chosen == null) return null;
         if (chosen.getRedSpawn() == null || chosen.getBlueSpawn() == null) {
@@ -20,7 +28,8 @@ public record GameArena(Location redSpawn, Location blueSpawn, Location redBed, 
         try {
             String name;
             name = chosen.getName() + (RandomUtils.nextBoolean() ? "_" : "-") + UUID.randomUUID().toString().substring(0, RandomUtils.nextInt(4, 12));
-            if (Bukkit.getWorld(name) == null)  name = chosen.getName() + (RandomUtils.nextBoolean() ? "_" : "-") + UUID.randomUUID().toString().substring(0, RandomUtils.nextInt(4, 12));
+            if (Bukkit.getWorld(name) == null)
+                name = chosen.getName() + (RandomUtils.nextBoolean() ? "_" : "-") + UUID.randomUUID().toString().substring(0, RandomUtils.nextInt(4, 12));
 
             WorldUtil.cloneArena(chosen, name);
 

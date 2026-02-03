@@ -3,5 +3,7 @@ version: '1.0-SNAPSHOT'
 main: top.circlenetwork.circlePractice.CirclePractice
 api-version: '1.18'
 permissions:
-  circlepractice.kit:
+  circlepractice.command.kit:
+    default: op
+  circlepractice.command.arena:
     default: op

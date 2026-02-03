@@ -19,11 +19,11 @@ public final class CirclePractice extends JavaPlugin {
         ListenerManager.registerAll(this);
         Arena.loadAll();
         Kit.loadAll();
-
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        Arena.saveAll();
+        Kit.saveAll();
     }
 }

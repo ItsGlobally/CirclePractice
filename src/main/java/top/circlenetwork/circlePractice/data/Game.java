@@ -2,11 +2,14 @@ package top.circlenetwork.circlePractice.data;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Player;
+import lombok.Setter;
 import top.circlenetwork.circlePractice.handlers.GameHandler;
 import top.circlenetwork.circlePractice.utils.Msg;
 
+import javax.xml.stream.Location;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -20,6 +23,12 @@ public class Game {
     private final HashMap<UUID, PracticePlayer> allBlue;
     private final HashMap<UUID, UUID> lasthit = new HashMap<>();
     private final HashMap<UUID, Boolean> respawnable = new HashMap<>();
+    private final HashMap<UUID, List<Location>> blocks = new HashMap<>();
+    @Setter
+    private boolean started = false;
+    @Setter
+    private boolean ended = false;
+
 
 
     public void broadcast(String msg) {

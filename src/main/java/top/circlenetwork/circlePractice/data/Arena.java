@@ -9,21 +9,64 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import top.circlenetwork.circlePractice.utils.FileUtil;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @ToString
 public class Arena {
     @Getter
     private static final Map<String, Arena> arenas = new HashMap<>();
+    private final String name;
+    private final YamlFile sourceYml;
+    private final FileConfiguration source;
+    private final EnumMap<ArenaOption, Object> optionCache = new EnumMap<>(ArenaOption.class);
+    @Setter
+    @Getter
+    private Location redSpawn, blueSpawn, redBed, blueBed;
+    @Getter
+    private final List<String> allowedKits = new ArrayList<>();
+
+    // instance
+
+    public Arena(String name) {
+        this.name = name;
+        this.sourceYml = new YamlFile("arenas/" + name + ".yml");
+        this.source = sourceYml.getConfig();
+        for (ArenaOption option : ArenaOption.values()) {
+            Object value = source.contains(option.getPath())
+                    ? source.get(option.getPath())
+                    : option.getDefaultValue();
+
+            if (!option.getDefaultValue().getClass().isInstance(value)) {
+                Bukkit.getLogger().warning(
+                        "[Arena] Invalid type for " + name + "." + option.getPath()
+                );
+                value = option.getDefaultValue();
+            }
+
+            optionCache.put(option, value);
+        }
+
+        if (source.contains("allowedKits")) {
+            allowedKits.addAll(source.getStringList("allowedKits"));
+        }
+
+        arenas.put(name, this);
+    }
+
     public static void loadAll() {
         Map<String, YamlFile> all = FileUtil.loadYamlFolder("arenas");
         for (Map.Entry<String, YamlFile> entry : all.entrySet()) {
             loadFromYml(entry.getValue().getConfig(), entry.getKey());
         }
     }
+
+    public static void saveAll() {
+        for (Arena arena : arenas.values()) {
+            arena.save();
+        }
+    }
+
     public static Arena loadFromYml(FileConfiguration cfg, String name) {
         Location redSpawn = deserializeLocation(cfg, "redSpawn");
         Location blueSpawn = deserializeLocation(cfg, "blueSpawn");
@@ -48,47 +91,18 @@ public class Arena {
         return arenas.get(name);
     }
 
-    // instance
-
-    private final String name;
-    @Setter
-    @Getter
-    private Location redSpawn, blueSpawn, redBed, blueBed;
-    private final YamlFile sourceYml;
-    private final FileConfiguration source;
-    private final EnumMap<ArenaOption, Object> optionCache = new EnumMap<>(ArenaOption.class);
-
-
-    public Arena(String name) {
-        this.name = name;
-        this.sourceYml = new YamlFile("arenas/" + name + ".yml");
-        this.source = sourceYml.getConfig();
-        for (ArenaOption option : ArenaOption.values()) {
-            Object value = source.contains(option.getPath())
-                    ? source.get(option.getPath())
-                    : option.getDefaultValue();
-
-            if (!option.getDefaultValue().getClass().isInstance(value)) {
-                Bukkit.getLogger().warning(
-                        "[Arena] Invalid type for " + name + "." + option.getPath()
-                );
-                value = option.getDefaultValue();
-            }
-
-            optionCache.put(option, value);
-        }
-
-        arenas.put(name, this);
-    }
-
-
     public void save() {
         source.set("redSpawn", redSpawn.serialize());
         source.set("blueSpawn", blueSpawn.serialize());
-        source.set("redBed", redBed.serialize());
-        source.set("blueBed", blueBed.serialize());
+        if (redBed != null) source.set("redBed", redBed.serialize());
+        if (blueBed != null) source.set("blueBed", blueBed.serialize());
+        for (Map.Entry<ArenaOption, Object> entry : optionCache.entrySet()) {
+            source.set(entry.getKey().getPath(), entry.getValue());
+        }
+        source.set("allowedKits", allowedKits);
         sourceYml.save();
     }
+
     public boolean getBoolean(ArenaOption option) {
         return (boolean) optionCache.get(option);
     }
@@ -104,11 +118,11 @@ public class Arena {
     public void setInt(ArenaOption option, int value) {
         optionCache.put(option, value);
     }
+
     public void reload() {
         arenas.remove(this.name);
         loadFromYml(sourceYml.getConfig(), this.name);
     }
-
 
 
     @Getter

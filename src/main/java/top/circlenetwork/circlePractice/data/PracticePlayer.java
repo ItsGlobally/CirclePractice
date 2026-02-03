@@ -17,6 +17,26 @@ public class PracticePlayer implements Global {
     /* ================= static ================= */
 
     private static final Map<UUID, PracticePlayer> PLAYERS = new HashMap<>();
+    @Getter
+    private final Player player;
+    @Getter
+    private final PlayerData playerData;
+    @Setter
+    @Getter
+    private SpawnState state = SpawnState.SPAWN;
+    @Setter
+    @Getter
+    private String queuedKit;
+
+    /* ================= instance ================= */
+    @Getter
+    @Setter
+    private Game currentGame;
+
+    public PracticePlayer(Player player) {
+        this.player = player;
+        this.playerData = new PlayerData(player.getUniqueId());
+    }
 
     public static PracticePlayer of(Player player) {
         return PLAYERS.computeIfAbsent(
@@ -37,32 +57,6 @@ public class PracticePlayer implements Global {
         return PLAYERS.values();
     }
 
-    /* ================= instance ================= */
-
-    @Getter
-    private final Player player;
-
-    @Setter
-    @Getter
-    private SpawnState state = SpawnState.SPAWN;
-
-    @Setter
-    @Getter
-    private String queuedKit;
-
-    @Getter
-    private final PlayerData playerData;
-
-    public PracticePlayer(Player player) {
-        this.player = player;
-        this.playerData = new PlayerData(player.getUniqueId());
-    }
-    @Getter
-    @Setter
-    private Game currentGame;
-
-
-
     public UUID getUuid() {
         return player.getUniqueId();
     }
@@ -81,8 +75,10 @@ public class PracticePlayer implements Global {
     public enum SpawnState {
         SPAWN,
         QUEUING,
-        EDITING
+        EDITING,
+        NOTSPAWN
     }
+
     @Getter
     public static class PlayerData {
 
@@ -98,6 +94,32 @@ public class PracticePlayer implements Global {
             this.sourceYml = new YamlFile("playerdata/" + uuid + ".yml");
             this.source = sourceYml.getConfig();
             load();
+        }
+
+        public static List<Map<String, Object>> serializeItemStackArray(ItemStack[] items) {
+            List<Map<String, Object>> list = new ArrayList<>();
+
+            for (ItemStack item : items) {
+                if (item == null) {
+                    list.add(null);
+                } else {
+                    list.add(item.serialize());
+                }
+            }
+            return list;
+        }
+
+        @SuppressWarnings("unchecked")
+        public static ItemStack[] deserializeItemStackArray(List<?> list) {
+            ItemStack[] items = new ItemStack[list.size()];
+
+            for (int i = 0; i < list.size(); i++) {
+                Object obj = list.get(i);
+
+                if (obj == null) continue;
+                items[i] = ItemStack.deserialize((Map<String, Object>) obj);
+            }
+            return items;
         }
 
         public void load() {
@@ -121,31 +143,6 @@ public class PracticePlayer implements Global {
             }
         }
 
-
-        public static List<Map<String, Object>> serializeItemStackArray(ItemStack[] items) {
-            List<Map<String, Object>> list = new ArrayList<>();
-
-            for (ItemStack item : items) {
-                if (item == null) {
-                    list.add(null);
-                } else {
-                    list.add(item.serialize());
-                }
-            }
-            return list;
-        }
-        @SuppressWarnings("unchecked")
-        public static ItemStack[] deserializeItemStackArray(List<?> list) {
-            ItemStack[] items = new ItemStack[list.size()];
-
-            for (int i = 0; i < list.size(); i++) {
-                Object obj = list.get(i);
-
-                if (obj == null) continue;
-                items[i] = ItemStack.deserialize((Map<String, Object>) obj);
-            }
-            return items;
-        }
         public void save() {
             source.set("level", level);
 
@@ -165,8 +162,6 @@ public class PracticePlayer implements Global {
 
             sourceYml.save();
         }
-
-
 
 
     }

@@ -3,8 +3,10 @@ package top.circlenetwork.circlePractice.handlers;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import top.circlenetwork.circlePractice.data.Global;
+import top.circlenetwork.circlePractice.data.Kit;
 import top.circlenetwork.circlePractice.data.PracticePlayer;
 import top.circlenetwork.circlePractice.utils.Msg;
+import top.circlenetwork.circlePractice.utils.RandomUtils;
 
 import java.util.*;
 
@@ -23,7 +25,7 @@ public class QueueHandler implements Global {
 
         queue.addLast(player.getUniqueId());
         pp.setState(PracticePlayer.SpawnState.QUEUING);
-        Msg.send(player, "&cJoined " + kitName + " queue.");
+        Msg.send(player, "&a已加入模式" + kitName + "的對列");
 
         tryMatch(kitName);
     }
@@ -40,6 +42,21 @@ public class QueueHandler implements Global {
             tryMatch(kitName);
             return;
         }
+        boolean revert = RandomUtils.nextBoolean();
+        HashMap<UUID, PracticePlayer> red = new HashMap<>();
+        HashMap<UUID, PracticePlayer> blue = new HashMap<>();
+        if (revert) {
+            red.put(p1.getUniqueId(), PracticePlayer.get(p1.getUniqueId()));
+            blue.put(p2.getUniqueId(), PracticePlayer.get(p2.getUniqueId()));
+        } else {
+            red.put(p2.getUniqueId(), PracticePlayer.get(p2.getUniqueId()));
+            blue.put(p1.getUniqueId(), PracticePlayer.get(p1.getUniqueId()));
+        }
+
+        if (GameHandler.startGame(red, blue, Kit.getKit(kitName)) == null) {
+            Msg.send(p1, "&c創建遊戲時發生錯誤");
+            Msg.send(p2, "&c創建遊戲時發生錯誤");
+        }
     }
 
     public static void leaveQueue(Player player) {
@@ -48,5 +65,6 @@ public class QueueHandler implements Global {
         }
         PracticePlayer pp = PracticePlayer.get(player.getUniqueId());
         pp.setState(PracticePlayer.SpawnState.SPAWN);
+        Msg.send(player, "&a已離開隊列");
     }
 }

@@ -19,17 +19,39 @@ public class QueueCommand extends CommandBase {
         }
 
         if (args.length < 1) {
-            Msg.send(player, "&c用法: /queue <模式>");
+            Msg.send(player, "&c用法: /queue <join/leave>");
             return;
         }
-
-        String kit = args[0];
-        if (Kit.getKit(kit) == null) {
-            Msg.send(player, "&c這個模式不存在!");
-            return;
+        switch (args[0]) {
+            case "join" -> {
+                if (practicePlayer.getState() == PracticePlayer.SpawnState.QUEUING) {
+                    Msg.send(player, "&c你已經排隊了");
+                }
+                if (args.length < 2) {
+                    Msg.send(player, "&c用法: /queue join <模式>");
+                    return;
+                }
+                String kit = args[1];
+                if (Kit.getKit(kit) == null) {
+                    Msg.send(player, "&c這個模式不存在!");
+                    return;
+                }
+                if (practicePlayer.getState() != PracticePlayer.SpawnState.SPAWN || practicePlayer.getQueuedKit() != null) {
+                    Msg.send(player, "&c你不在出生點");
+                }
+                QueueHandler.joinQueue(player, kit);
+            }
+            case "leave" -> {
+                if (practicePlayer.getState() != PracticePlayer.SpawnState.SPAWN || practicePlayer.getQueuedKit() != null) {
+                    Msg.send(player, "&c你不在出生點");
+                }
+                if (practicePlayer.getState() != PracticePlayer.SpawnState.QUEUING) {
+                    Msg.send(player, "&c你沒有在排隊");
+                    return;
+                }
+                QueueHandler.leaveQueue(player);
+            }
         }
-
-        QueueHandler.joinQueue(player, kit);
 
 
     }

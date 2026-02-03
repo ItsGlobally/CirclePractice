@@ -3,14 +3,12 @@ package top.circlenetwork.circlePractice.commands;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import top.circlenetwork.circlePractice.annotation.CommandInfo;
 import top.circlenetwork.circlePractice.data.Global;
 
@@ -83,7 +81,8 @@ public class CommandManager implements Global {
                         try {
                             cmdInstance.allExecute(sender, label, args);
                             isAllExecuted = true;
-                        } catch (UnsupportedOperationException ignored) {}
+                        } catch (UnsupportedOperationException ignored) {
+                        }
 
                         if (!isAllExecuted) {
                             sender.sendMessage("§c只有玩家可以執行這個指令");
@@ -117,7 +116,6 @@ public class CommandManager implements Global {
             }
 
         };
-
 
 
         cmd.setAliases(Arrays.asList(info.aliases()));

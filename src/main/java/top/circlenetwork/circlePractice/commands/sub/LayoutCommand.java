@@ -15,10 +15,13 @@ public class LayoutCommand extends CommandBase {
             Msg.send(player, "&c用法: /layout <副指令> <值>");
         }
         String cmd = args[0];
-        String value = args[1];
 
         switch (cmd) {
             case "edit" -> {
+                if (args.length < 2) {
+                    Msg.send(player, "&c用法: /kit create <名字>");
+                }
+                String value = args[1];
                 Kit kit = Kit.getKit(value);
                 if (kit == null) {
                     Msg.send(player, "&c該模式不存在!");

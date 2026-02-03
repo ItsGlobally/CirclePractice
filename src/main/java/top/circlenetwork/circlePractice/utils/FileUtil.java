@@ -4,7 +4,9 @@ import top.circlenetwork.circlePractice.data.Global;
 import top.circlenetwork.circlePractice.data.YamlFile;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class FileUtil implements Global {
     public static Map<String, YamlFile> loadYamlFolder(String folder) {

@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 @Getter
-public class YamlFile implements Global{
+public class YamlFile implements Global {
 
     private final File file;
     private FileConfiguration config;
