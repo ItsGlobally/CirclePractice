@@ -38,12 +38,14 @@ public class QueueCommand extends CommandBase {
                 }
                 if (practicePlayer.getState() != PracticePlayer.SpawnState.SPAWN || practicePlayer.getQueuedKit() != null) {
                     Msg.send(player, "&c你不在出生點");
+                    return;
                 }
                 QueueHandler.joinQueue(player, kit);
             }
             case "leave" -> {
                 if (practicePlayer.getState() != PracticePlayer.SpawnState.SPAWN || practicePlayer.getQueuedKit() != null) {
                     Msg.send(player, "&c你不在出生點");
+                    return;
                 }
                 if (practicePlayer.getState() != PracticePlayer.SpawnState.QUEUING) {
                     Msg.send(player, "&c你沒有在排隊");

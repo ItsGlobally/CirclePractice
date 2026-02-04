@@ -56,6 +56,8 @@ public class QueueHandler implements Global {
         if (GameHandler.startGame(red, blue, Kit.getKit(kitName)) == null) {
             Msg.send(p1, "&c創建遊戲時發生錯誤");
             Msg.send(p2, "&c創建遊戲時發生錯誤");
+            PracticePlayer.get(p1.getUniqueId()).setQueuedKit(null);
+            PracticePlayer.get(p2.getUniqueId()).setQueuedKit(null);
         }
     }
 

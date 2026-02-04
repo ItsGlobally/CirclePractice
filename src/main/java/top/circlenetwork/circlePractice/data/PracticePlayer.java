@@ -3,6 +3,7 @@ package top.circlenetwork.circlePractice.data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -12,6 +13,7 @@ import top.circlenetwork.circlePractice.utils.LuckPermsUtil;
 import java.util.*;
 
 @RequiredArgsConstructor
+@ToString
 public class PracticePlayer implements Global {
 
     /* ================= static ================= */

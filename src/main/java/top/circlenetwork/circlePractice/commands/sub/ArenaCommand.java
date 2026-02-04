@@ -13,6 +13,7 @@ public class ArenaCommand extends CommandBase {
     public void playerExecute(Player player, String label, String[] args) {
         if (args.length < 2) {
             Msg.send(player, "&c用法: /arena <副指令> <值>");
+            return;
         }
         String cmd = args[0];
         String value = args[1];

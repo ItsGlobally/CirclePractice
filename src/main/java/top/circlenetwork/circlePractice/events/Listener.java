@@ -1,13 +1,11 @@
 package top.circlenetwork.circlePractice.events;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -32,6 +30,19 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent event) {
+        PracticePlayer practicePlayer = PracticePlayer.get(event.getPlayer().getUniqueId());
+
+        Game game = practicePlayer.getCurrentGame();
+        if (game != null) {
+            if (game.getGameHandler().isRed(practicePlayer)) {
+                if (game.getRed().size() - 1 == 0) game.getGameHandler().end(false);
+                game.getRed().remove(practicePlayer.getUuid());
+            } else {
+                if (game.getBlue().size() - 1 == 0) game.getGameHandler().end(true);
+                game.getBlue().remove(practicePlayer.getUuid());
+            }
+        }
+
         PracticePlayer.remove(event.getPlayer().getUniqueId());
     }
 
@@ -62,6 +73,10 @@ public class Listener implements org.bukkit.event.Listener {
         }
 
         Game game = vPP.getCurrentGame();
+        if (!game.getCanGetDamaged().get(attacker.getUniqueId())) {
+            game.getCanGetDamaged().put(attacker.getUniqueId(), true);
+            Msg.send(attacker, "&c你攻擊了其他玩家所以失去了重生保護!");
+        }
         game.getLasthit().put(vPP.getUuid(), aPP.getUuid());
     }
 
@@ -75,16 +90,20 @@ public class Listener implements org.bukkit.event.Listener {
         PracticePlayer pp = PracticePlayer.get(player.getUniqueId());
 
         if (pp.getCurrentGame() == null) return;
+        Game game = pp.getCurrentGame();
+
+        if (!game.getCanGetDamaged().get(pp.getUuid())) {
+            event.setCancelled(true);
+            return;
+        }
 
         if (player.getHealth() - event.getFinalDamage() > 0) return;
 
         event.setCancelled(true);
 
-        Game game = pp.getCurrentGame();
         UUID lastHit = game.getLasthit().get(pp.getUuid());
-
-        if (lastHit != null) {
-            PracticePlayer killer = PracticePlayer.get(lastHit);
+        PracticePlayer killer = PracticePlayer.get(lastHit);
+        if (lastHit != null && killer != null) {
             game.getGameHandler().death(pp, killer, false);
         } else {
             game.getGameHandler().death(pp, null, false);
@@ -101,6 +120,13 @@ public class Listener implements org.bukkit.event.Listener {
 
         Game game = practicePlayer.getCurrentGame();
 
+        if (!game.isStarted()) {
+            if (event.getFrom().getX() != event.getTo().getX() || event.getFrom().getZ() != event.getTo().getZ()) {
+                event.setTo(event.getFrom());
+            }
+            return;
+        }
+
         if (player.getLocation().getY() <= game.getGameArena().arena().getInt(Arena.ArenaOption.VOID)) {
             if (game.getLasthit().get(practicePlayer.getUuid()) != null) {
                 game.getGameHandler().death(practicePlayer, PracticePlayer.get(game.getLasthit().get(practicePlayer.getUuid())), true);
@@ -111,12 +137,37 @@ public class Listener implements org.bukkit.event.Listener {
     }
 
     @EventHandler
-    public void BlockBreak(BlockBreakEvent event) {
-        PracticePlayer practicePlayer = PracticePlayer.get(event.getPlayer().getUniqueId());
+    public void BlockPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        PracticePlayer practicePlayer = PracticePlayer.get(player.getUniqueId());
         if (practicePlayer == null) return;
 
-        if (practicePlayer.getState() != PracticePlayer.SpawnState.NOTSPAWN && event.getPlayer().getGameMode() != GameMode.CREATIVE) {
+        if (practicePlayer.getState() != PracticePlayer.SpawnState.NOTSPAWN && player.getGameMode() != GameMode.CREATIVE) {
             event.setCancelled(true);
+            return;
+        }
+        if (practicePlayer.getCurrentGame() != null) {
+            Game game = practicePlayer.getCurrentGame();
+
+            if (!game.getKit().getBoolean(Kit.KitOption.BUILD)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            game.getBlocks().get(player.getUniqueId()).add(event.getBlockPlaced().getLocation());
+        }
+    }
+
+    @EventHandler
+    public void BlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getLogger().info(player.getName() + " destoryed " + event.getBlock().getType());
+        PracticePlayer practicePlayer = PracticePlayer.get(player.getUniqueId());
+        if (practicePlayer == null) return;
+
+        if (practicePlayer.getState() != PracticePlayer.SpawnState.NOTSPAWN && player.getGameMode() != GameMode.CREATIVE) {
+            event.setCancelled(true);
+            return;
         }
         if (practicePlayer.getCurrentGame() != null) {
             Game game = practicePlayer.getCurrentGame();
@@ -153,11 +204,11 @@ public class Listener implements org.bukkit.event.Listener {
                             "&d&lBED DESTROYED &f» " +
                                     (game.getGameHandler().isRed(practicePlayer) ? "&9藍隊" : "&c紅隊") +
                                     " &f的床已被" +
-                                    event.getPlayer().getName() + "&f破壞!"
+                                    player.getName() + "&f破壞!"
                     );
 
-                    event.getPlayer().playSound(
-                            event.getPlayer().getLocation(),
+                    player.playSound(
+                            player.getLocation(),
                             Sound.ENDERDRAGON_GROWL,
                             1.0f,
                             1.0f
@@ -169,28 +220,28 @@ public class Listener implements org.bukkit.event.Listener {
 
                 if (isOwnBed) {
                     event.setCancelled(true);
-                    Msg.send(event.getPlayer(), "&c你不能挖自己的床!");
+                    Msg.send(player, "&c你不能挖自己的床!");
                     return;
                 }
 
                 event.setCancelled(true);
                 return;
             }
-
-            if (game.getKit().getBoolean(Kit.KitOption.BUILD)) {
-                if (!game.getBlocks().get(event.getPlayer().getUniqueId()).contains(event.getBlock().getLocation())) {
-                    event.setCancelled(true);
-                    Msg.send(event.getPlayer(), "&c你不能破壞這裡的方塊");
-                    return;
-                }
-            }
-
             if (game.getGameHandler().isNearAnyBed(event.getBlock().getLocation())) {
                 if (!game.getKit().getAllowedBreakBlocksAroundBed().contains(event.getBlock().getType())) {
                     event.setCancelled(true);
-                    Msg.send(event.getPlayer(), "&c你不能破壞這裡的方塊");
+                    Msg.send(player, "&c你不能破壞這裡的方塊");
+                }
+                return;
+            }
+            if (game.getKit().getBoolean(Kit.KitOption.BUILD)) {
+                if (!game.getBlocks().get(player.getUniqueId()).contains(event.getBlock().getLocation())) {
+                    event.setCancelled(true);
+                    Msg.send(player, "&c你不能破壞這裡的方塊");
                 }
             }
+            game.getBlocks().get(player.getUniqueId()).remove(event.getBlock().getLocation());
+
         }
     }
 }

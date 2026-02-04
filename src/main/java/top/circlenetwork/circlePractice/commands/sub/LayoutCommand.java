@@ -11,15 +11,17 @@ import top.circlenetwork.circlePractice.utils.Msg;
 public class LayoutCommand extends CommandBase {
     @Override
     public void playerExecute(Player player, String label, String[] args) {
-        if (args.length < 2) {
+        if (args.length < 1) {
             Msg.send(player, "&c用法: /layout <副指令> <值>");
+            return;
         }
         String cmd = args[0];
 
         switch (cmd) {
             case "edit" -> {
                 if (args.length < 2) {
-                    Msg.send(player, "&c用法: /kit create <名字>");
+                    Msg.send(player, "&c用法: /layout create <名字>");
+                    return;
                 }
                 String value = args[1];
                 Kit kit = Kit.getKit(value);
@@ -38,14 +40,14 @@ public class LayoutCommand extends CommandBase {
                 player.getInventory().setContents(kit.getInventory());
                 player.getInventory().setArmorContents(kit.getArmor());
 
-                Msg.send(player, "&c你現在正在編輯模式" + kit.getName() + "的排版, 使用/layout save來儲存");
+                Msg.send(player, "&a你現在正在編輯模式" + kit.getName() + "的排版, 使用/layout save來儲存");
             }
 
             case "save" -> {
                 PracticePlayer practicePlayer = PracticePlayer.get(player.getUniqueId());
 
                 if (practicePlayer.getCurrentGame() != null) {
-                    Msg.send(player, "&c你正在遊戲中");
+                    Msg.send(player, "&c你不在出生點");
                     return;
                 }
 
@@ -71,6 +73,28 @@ public class LayoutCommand extends CommandBase {
 
                 Msg.send(player, "&a已儲存模式" + kit.getName() + "的排版");
             }
+            case "apply" -> {
+                if (args.length < 2) {
+                    Msg.send(player, "&c用法: /layout apply <名字>");
+                    return;
+                }
+                String value = args[1];
+                Kit kit = Kit.getKit(value);
+                if (kit == null) {
+                    Msg.send(player, "&c該模式不存在!");
+                    return;
+                }
+                PracticePlayer practicePlayer = PracticePlayer.get(player.getUniqueId());
+                if (practicePlayer.getCurrentGame() != null || practicePlayer.getState() != PracticePlayer.SpawnState.SPAWN) {
+                    Msg.send(player, "&c你不在出生點");
+                    return;
+                }
+
+                player.getInventory().setArmorContents(practicePlayer.getPlayerData().getKitArmors().get(kit.getName()));
+                player.getInventory().setContents(practicePlayer.getPlayerData().getKitInventories().get(kit.getName()));
+                Msg.send(player, "&a已將你的背包設定為你該模式的排版");
+            }
         }
+
     }
 }

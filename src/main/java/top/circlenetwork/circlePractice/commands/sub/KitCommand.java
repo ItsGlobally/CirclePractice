@@ -15,6 +15,7 @@ public class KitCommand extends CommandBase {
     public void playerExecute(Player player, String label, String[] args) {
         if (args.length < 1) {
             Msg.send(player, "&c用法: /kit <副指令>");
+            return;
         }
         String cmd = args[0];
 
@@ -23,6 +24,7 @@ public class KitCommand extends CommandBase {
             case "create" -> {
                 if (args.length < 2) {
                     Msg.send(player, "&c用法: /kit create <名字>");
+                    return;
                 }
                 String value = args[1];
                 if (Kit.getKit(value) != null) {
@@ -143,6 +145,7 @@ public class KitCommand extends CommandBase {
             case "edit" -> {
                 if (args.length < 2) {
                     Msg.send(player, "&c用法: /kit edit <名字>");
+                    return;
                 }
                 String value = args[1];
                 Kit kit = Kit.getKit(value);
@@ -193,6 +196,27 @@ public class KitCommand extends CommandBase {
                 practicePlayer.setState(PracticePlayer.SpawnState.SPAWN);
 
                 Msg.send(player, "&a已為所有玩家儲存模式 &e" + kit.getName() + " &a的排版");
+            }
+            case "apply" -> {
+                if (args.length < 2) {
+                    Msg.send(player, "&c用法: /kit apply <名字>");
+                    return;
+                }
+                String value = args[1];
+                Kit kit = Kit.getKit(value);
+                if (kit == null) {
+                    Msg.send(player, "&c該模式不存在!");
+                    return;
+                }
+                PracticePlayer practicePlayer = PracticePlayer.get(player.getUniqueId());
+                if (practicePlayer.getCurrentGame() != null || practicePlayer.getState() != PracticePlayer.SpawnState.SPAWN) {
+                    Msg.send(player, "&c你不在出生點");
+                    return;
+                }
+
+                player.getInventory().setArmorContents(kit.getArmor());
+                player.getInventory().setContents(kit.getInventory());
+                Msg.send(player, "&a已將你的背包設定為模式的預設排版");
             }
         }
     }
