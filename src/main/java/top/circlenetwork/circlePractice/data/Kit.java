@@ -20,7 +20,7 @@ public class Kit {
     private final YamlFile sourceYml;
     private final FileConfiguration source;
     private final EnumMap<KitOption, Object> optionCache = new EnumMap<>(KitOption.class);
-    private final List<Material> allowedBreakBlocksAroundBed = new ArrayList<>();
+    private final Set<Material> allowedBreakBlocksAroundBed = EnumSet.noneOf(Material.class);
 
     // instance
     @Setter

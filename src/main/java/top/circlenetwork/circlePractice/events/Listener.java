@@ -46,44 +46,54 @@ public class Listener implements org.bukkit.event.Listener {
         PracticePlayer.remove(event.getPlayer().getUniqueId());
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onDamageByEntity(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player victim)) {
-            event.setCancelled(true);
+        if (!(event.getDamager() instanceof Player attacker)) {
             return;
         }
-        if (!(event.getDamager() instanceof Player attacker)) {
-            event.setCancelled(true);
+
+        PracticePlayer aPP = PracticePlayer.get(attacker.getUniqueId());
+
+        if (aPP.getCurrentGame() == null) {
+
+            if (!(event.getEntity() instanceof Player)) {
+                event.setCancelled(true);
+            }
+
+            return;
+        }
+
+        if (!(event.getEntity() instanceof Player victim)) {
             return;
         }
 
         PracticePlayer vPP = PracticePlayer.get(victim.getUniqueId());
-        PracticePlayer aPP = PracticePlayer.get(attacker.getUniqueId());
+
+        if (vPP.getCurrentGame() == null
+                || vPP.getCurrentGame() != aPP.getCurrentGame()) {
+            event.setCancelled(true);
+            return;
+        }
 
         if (vPP.getState() != PracticePlayer.SpawnState.NOTSPAWN) {
             event.setCancelled(true);
             return;
         }
 
-        if (vPP.getCurrentGame() == null
-                || aPP.getCurrentGame() == null
-                || vPP.getCurrentGame() != aPP.getCurrentGame()) {
-            event.setCancelled(true);
-            return;
-        }
-
         Game game = vPP.getCurrentGame();
+
         if (!game.getCanGetDamaged().get(attacker.getUniqueId())) {
             game.getCanGetDamaged().put(attacker.getUniqueId(), true);
             Msg.send(attacker, "&c你攻擊了其他玩家所以失去了重生保護!");
         }
+
         game.getLasthit().put(vPP.getUuid(), aPP.getUuid());
     }
+
 
     @EventHandler()
     public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) {
-            event.setCancelled(true);
             return;
         }
 
