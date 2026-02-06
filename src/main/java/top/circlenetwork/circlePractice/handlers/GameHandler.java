@@ -1,17 +1,14 @@
 package top.circlenetwork.circlePractice.handlers;
 
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import top.circlenetwork.circlePractice.data.*;
 import top.circlenetwork.circlePractice.utils.Msg;
 import top.circlenetwork.circlePractice.utils.NoteBlockUtil;
 import top.circlenetwork.circlePractice.utils.TeamColorUtil;
+import top.circlenetwork.circlePractice.utils.TitleUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,11 +81,13 @@ public class GameHandler implements Global {
                     for (PracticePlayer practicePlayer : ng.getRed().values()) {
                         Player player = practicePlayer.getPlayer();
                         ng.getCanGetDamaged().put(player.getUniqueId(), true);
+                        player.playSound(player.getLocation(), Sound.FIREWORK_BLAST, 1.0f, 1.0f);
                         Msg.send(player, "&a遊戲開始!");
                     }
                     for (PracticePlayer practicePlayer : ng.getBlue().values()) {
                         Player player = practicePlayer.getPlayer();
                         ng.getCanGetDamaged().put(player.getUniqueId(), true);
+                        player.playSound(player.getLocation(), Sound.FIREWORK_BLAST, 1.0f, 1.0f);
                         Msg.send(player, "&a遊戲開始!");
                     }
                     cancel();
@@ -96,16 +95,16 @@ public class GameHandler implements Global {
                 }
                 for (PracticePlayer practicePlayer : ng.getRed().values()) {
                     Player player = practicePlayer.getPlayer();
-                    if (startTime[0] == 3) NoteBlockUtil.glass(player, 20);
-                    if (startTime[0] == 2) NoteBlockUtil.glass(player, 18);
-                    if (startTime[0] == 1) NoteBlockUtil.glass(player, 15);
+                    if (startTime[0] == 3) NoteBlockUtil.gold(player, 20);
+                    if (startTime[0] == 2) NoteBlockUtil.gold(player, 18);
+                    if (startTime[0] == 1) NoteBlockUtil.gold(player, 15);
                     Msg.send(player, "&e遊戲在" + startTime[0] + "內開始...");
                 }
                 for (PracticePlayer practicePlayer : ng.getBlue().values()) {
                     Player player = practicePlayer.getPlayer();
-                    if (startTime[0] == 3) NoteBlockUtil.glass(player, 20);
-                    if (startTime[0] == 2) NoteBlockUtil.glass(player, 18);
-                    if (startTime[0] == 1) NoteBlockUtil.glass(player, 15);
+                    if (startTime[0] == 3) NoteBlockUtil.gold(player, 20);
+                    if (startTime[0] == 2) NoteBlockUtil.gold(player, 18);
+                    if (startTime[0] == 1) NoteBlockUtil.gold(player, 15);
                     Msg.send(player, "&e遊戲在" + startTime[0] + "秒後開始...");
                 }
 
@@ -140,6 +139,7 @@ public class GameHandler implements Global {
                 Math.abs(loc1.getBlockY() - loc2.getBlockY()) <= radius &&
                 Math.abs(loc1.getBlockZ() - loc2.getBlockZ()) <= radius;
     }
+
     public boolean isBedNear(Location bedBase, Location loc) {
         Location head = bedBase.clone();
         Location footX = bedBase.clone().add(1, 0, 0);
@@ -192,7 +192,6 @@ public class GameHandler implements Global {
         if (game.isEnded()) return;
         if (victim == null) return;
         Player victimPlayer = victim.getPlayer();
-        Player killerPlayer;
         String killMessage;
         if (killer == null) {
             if (walkedOff) {
@@ -220,6 +219,7 @@ public class GameHandler implements Global {
         } else {
             game.getCanGetDamaged().put(victim.getUuid(), false);
             game.getRespawning().put(victim.getUuid(), true);
+
             victimPlayer.teleport(isRed(victim) ? game.getGameArena().redSpawn() : game.getGameArena().blueSpawn());
             for (PracticePlayer practicePlayer : game.getRed().values()) {
                 Player player = practicePlayer.getPlayer();
@@ -251,8 +251,8 @@ public class GameHandler implements Global {
                         victimPlayer.setFireTicks(0);
                         victimPlayer.setFlying(false);
                         victimPlayer.setAllowFlight(false);
-                        victimPlayer.getInventory().setArmorContents(TeamColorUtil.colorTeamItems(game.getKit().getArmor(), false));
-                        victimPlayer.getInventory().setContents(TeamColorUtil.colorTeamItems(game.getKit().getInventory(), false));
+                        victimPlayer.getInventory().setArmorContents(TeamColorUtil.colorTeamItems(game.getKit().getArmor(), isRed(victim)));
+                        victimPlayer.getInventory().setContents(TeamColorUtil.colorTeamItems(game.getKit().getInventory(), isRed(victim)));
                         victimPlayer.teleport(isRed(victim) ? findSpawnpoint(game.getGameArena().redSpawn()) : findSpawnpoint(game.getGameArena().blueSpawn()));
                         game.getRespawning().put(victim.getUuid(), false);
                         new BukkitRunnable() {
@@ -264,6 +264,7 @@ public class GameHandler implements Global {
                         }.runTaskLater(plugin, 30L);
 
                         cancel();
+                        return;
                     }
                     Msg.send(victimPlayer, "&c在" + respawnTime[0] + "後重生...");
                     respawnTime[0]--;
@@ -300,36 +301,72 @@ public class GameHandler implements Global {
         }
         sb.append("\n&m                              ");
 
-        for (PracticePlayer practicePlayer : game.getRed().values()) {
-            if (practicePlayer.getPlayer() == null) return;
-            teleportSpawn(practicePlayer, sb.toString());
+        for (PracticePlayer pp : game.getRed().values()) {
+            Player player = pp.getPlayer();
+            if (player == null) continue;
+            if (redWon) {
+                TitleUtil.sendTitleAndSubtitle(
+                        player,
+                        "&a你贏了!",
+                        "你贏得了這場遊戲",
+                        20 * 5
+                );
+            } else {
+                TitleUtil.sendTitleAndSubtitle(
+                        player,
+                        "&c遊戲結束!",
+                        "再接再厲!",
+                        20 * 5
+                );
+            }
+
+            new BukkitRunnable() {
+
+                @Override
+                public void run() {
+                    PreDefinedData.teleportSpawn(pp, sb.toString());
+                }
+            }.runTaskLater(plugin, 20 * 5L);
         }
-        for (PracticePlayer practicePlayer : game.getBlue().values()) {
-            if (practicePlayer.getPlayer() == null) return;
-            teleportSpawn(practicePlayer, sb.toString());
+
+        for (PracticePlayer pp : game.getBlue().values()) {
+            Player player = pp.getPlayer();
+            if (player == null) continue;
+
+            if (!redWon) {
+                TitleUtil.sendTitleAndSubtitle(
+                        player,
+                        "&a你贏了!",
+                        "你贏得了這場遊戲",
+                        20 * 5
+                );
+            } else {
+                TitleUtil.sendTitleAndSubtitle(
+                        player,
+                        "&c遊戲結束!",
+                        "再接再厲!",
+                        20 * 5
+                );
+            }
+
+            new BukkitRunnable() {
+
+                @Override
+                public void run() {
+                    PreDefinedData.teleportSpawn(pp, sb.toString());
+                }
+            }.runTaskLater(plugin, 20 * 5L);
         }
+
 
         World world = game.getGameArena().redSpawn().getWorld();
 
         for (Player player : world.getPlayers()) {
             if (player == null || PracticePlayer.get(player.getUniqueId()) == null) continue;
-            teleportSpawn(PracticePlayer.get(player.getUniqueId()), sb.toString());
+            PreDefinedData.teleportSpawn(PracticePlayer.get(player.getUniqueId()), sb.toString());
         }
-    }
-    private void teleportSpawn(PracticePlayer practicePlayer, String msg) {
-        Player player = practicePlayer.getPlayer();
-        player.setHealth(20);
-        player.setFoodLevel(20);
-        player.setSaturation(20);
-        player.setFireTicks(0);
-        player.setAllowFlight(true);
-        player.setFlying(true);
-        player.getInventory().setArmorContents(null);
-        player.getInventory().setContents(new ItemStack[36]);
-        player.teleport(PreDefinedData.spawnLocation);
-        practicePlayer.setState(PracticePlayer.SpawnState.SPAWN);
-        practicePlayer.setCurrentGame(null);
-        Msg.send(player, msg);
+
+        Bukkit.unloadWorld(world, false);
     }
 
 }

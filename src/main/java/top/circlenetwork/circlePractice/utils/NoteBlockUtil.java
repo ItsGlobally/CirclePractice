@@ -2,8 +2,6 @@ package top.circlenetwork.circlePractice.utils;
 
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import top.circlenetwork.circlePractice.CirclePractice;
 
 public final class NoteBlockUtil {
 
@@ -42,6 +40,6 @@ public final class NoteBlockUtil {
     }
 
     public static void gold(Player player, int note) {
-        play(player, Sound.NOTE_PLING, note);
+        play(player, Sound.NOTE_PIANO, note);
     }
 }

@@ -20,11 +20,11 @@ public class Arena {
     private final YamlFile sourceYml;
     private final FileConfiguration source;
     private final EnumMap<ArenaOption, Object> optionCache = new EnumMap<>(ArenaOption.class);
+    @Getter
+    private final List<String> allowedKits = new ArrayList<>();
     @Setter
     @Getter
     private Location redSpawn, blueSpawn, redBed, blueBed;
-    @Getter
-    private final List<String> allowedKits = new ArrayList<>();
 
     // instance
 

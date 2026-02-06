@@ -1,31 +1,44 @@
 package top.circlenetwork.circlePractice.events;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 import top.circlenetwork.circlePractice.annotation.AutoListener;
-import top.circlenetwork.circlePractice.data.Arena;
-import top.circlenetwork.circlePractice.data.Game;
-import top.circlenetwork.circlePractice.data.Kit;
-import top.circlenetwork.circlePractice.data.PracticePlayer;
+import top.circlenetwork.circlePractice.data.*;
 import top.circlenetwork.circlePractice.utils.Msg;
 
-import java.util.Collection;
-import java.util.UUID;
+import java.util.*;
 
 @AutoListener
-public class Listener implements org.bukkit.event.Listener {
+public class Listener implements Global, org.bukkit.event.Listener {
+
+    private final Map<Location, UUID> tntPlacers = new HashMap<>();
+    private final Map<Location, UUID> lastIgnitedTnt = new HashMap<>();
+
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         PracticePlayer pp = PracticePlayer.of(event.getPlayer());
+        PreDefinedData.teleportSpawn(pp, "");
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -55,11 +68,7 @@ public class Listener implements org.bukkit.event.Listener {
         PracticePlayer aPP = PracticePlayer.get(attacker.getUniqueId());
 
         if (aPP.getCurrentGame() == null) {
-
-            if (!(event.getEntity() instanceof Player)) {
-                event.setCancelled(true);
-            }
-
+            event.setCancelled(true);
             return;
         }
 
@@ -81,6 +90,11 @@ public class Listener implements org.bukkit.event.Listener {
         }
 
         Game game = vPP.getCurrentGame();
+
+        if (game.isEnded() || !game.isStarted()) {
+            event.setCancelled(true);
+            return;
+        }
 
         if (!game.getCanGetDamaged().get(attacker.getUniqueId())) {
             game.getCanGetDamaged().put(attacker.getUniqueId(), true);
@@ -131,8 +145,10 @@ public class Listener implements org.bukkit.event.Listener {
         Game game = practicePlayer.getCurrentGame();
 
         if (!game.isStarted()) {
-            if (event.getFrom().getX() != event.getTo().getX() || event.getFrom().getZ() != event.getTo().getZ()) {
-                event.setTo(event.getFrom());
+            if (game.getKit().getBoolean(Kit.KitOption.FREEZE)) {
+                if (event.getFrom().getX() != event.getTo().getX() || event.getFrom().getZ() != event.getTo().getZ()) {
+                    event.setTo(event.getFrom());
+                }
             }
             return;
         }
@@ -165,8 +181,58 @@ public class Listener implements org.bukkit.event.Listener {
             }
 
             game.getBlocks().get(player.getUniqueId()).add(event.getBlockPlaced().getLocation());
+
+
+
+            if (event.getBlockPlaced().getType() == Material.TNT) {
+                event.setCancelled(true);
+                event.getBlockPlaced().setType(Material.AIR);
+
+                Location loc = event.getBlockPlaced().getLocation().add(0.5, 0, 0.5);
+                TNTPrimed tnt = loc.getWorld().spawn(loc, TNTPrimed.class);
+
+                tnt.setFuseTicks(40);
+
+                tnt.setMetadata("placer",
+                        new FixedMetadataValue(plugin,
+                                player.getUniqueId().toString())
+                );
+                tntPlacers.put(
+                        event.getBlockPlaced().getLocation(),
+                        event.getPlayer().getUniqueId()
+                );
+            }
         }
     }
+
+    @EventHandler
+    public void onIgnite(BlockIgniteEvent event) {
+        if (event.getBlock().getType() != Material.TNT) return;
+
+        Location loc = event.getBlock().getLocation();
+        UUID placer = tntPlacers.get(loc);
+
+        if (placer != null) {
+            lastIgnitedTnt.put(loc, placer);
+        }
+    }
+
+    @EventHandler
+    public void onSpawn(EntitySpawnEvent event) {
+        if (!(event.getEntity() instanceof TNTPrimed tnt)) return;
+
+        Location loc = event.getLocation().getBlock().getLocation();
+        UUID placer = lastIgnitedTnt.remove(loc);
+
+        if (placer == null) return;
+
+        tnt.setMetadata(
+                "placer",
+                new FixedMetadataValue(plugin, placer.toString())
+        );
+    }
+
+
 
     @EventHandler
     public void BlockBreak(BlockBreakEvent event) {
@@ -254,4 +320,100 @@ public class Listener implements org.bukkit.event.Listener {
 
         }
     }
+
+
+    @EventHandler
+    public void onFireball(PlayerInteractEvent event) {
+        Action action = event.getAction();
+
+        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+
+        if (player.getItemInHand() == null ||
+                player.getItemInHand().getType() != Material.FIREBALL) {
+            return;
+        }
+
+        Location eyeLoc = player.getEyeLocation();
+        Vector direction = eyeLoc.getDirection().normalize();
+        Location spawnLoc = eyeLoc.clone().add(direction.multiply(1.2));
+
+        Fireball fireball = player.getWorld().spawn(spawnLoc, Fireball.class);
+
+        fireball.setShooter(player);
+        fireball.setVelocity(direction.multiply(1.5));
+        fireball.setYield(2.0f);
+        fireball.setIsIncendiary(true);
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onExplode(EntityExplodeEvent event) {
+
+        Entity entity = event.getEntity();
+        Player player = null;
+
+        if (entity instanceof Fireball fireball) {
+            if (fireball.getShooter() instanceof Player) {
+                player = (Player) fireball.getShooter();
+            }
+        }
+
+        if (entity instanceof TNTPrimed tnt) {
+            if (tnt.hasMetadata("placer")) {
+                UUID uuid = UUID.fromString(
+                        tnt.getMetadata("placer").getFirst().asString()
+                );
+                player = Bukkit.getPlayer(uuid);
+            }
+        }
+
+
+        if (player == null) {
+            event.setCancelled(true);
+            return;
+        }
+
+        PracticePlayer practicePlayer = PracticePlayer.get(player.getUniqueId());
+        Game game = practicePlayer.getCurrentGame();
+
+        if (game == null) {
+            event.setCancelled(true);
+            return;
+        }
+
+        List<Block> blocks = event.blockList();
+        Iterator<Block> iterator = blocks.iterator();
+
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            Location loc = block.getLocation();
+
+            if (game.getGameHandler().isNearAnyBed(loc)) {
+                if (!game.getKit().getAllowedBreakBlocksAroundBed().contains(block.getType())) {
+                    iterator.remove();
+                    continue;
+                }
+            }
+
+            if (game.getKit().getBoolean(Kit.KitOption.BUILD)) {
+                UUID uuid = player.getUniqueId();
+                if (!game.getBlocks().get(uuid).contains(loc)) {
+                    iterator.remove();
+                    continue;
+                }
+            }
+
+            if (block.getType() == Material.BED) {
+                iterator.remove();
+                continue;
+            }
+
+            game.getBlocks().get(player.getUniqueId()).remove(loc);
+        }
+    }
+
 }

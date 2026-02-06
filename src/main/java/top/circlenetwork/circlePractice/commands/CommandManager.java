@@ -89,7 +89,7 @@ public class CommandManager implements Global {
                         }
                     }
                 } catch (Exception e) {
-                    sender.sendMessage("§c執行指令時發生錯誤!");
+                    sender.sendMessage("§c執行指令時發生錯誤! 請將錯誤原因回報給我們: " + e.getMessage());
                     e.printStackTrace();
                 }
 

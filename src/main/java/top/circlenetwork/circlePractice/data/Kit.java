@@ -27,6 +27,7 @@ public class Kit {
     private ItemStack[] inventory;
     @Setter
     private ItemStack[] armor;
+
     public Kit(String name) {
         this.name = name;
         this.inventory = new ItemStack[36];

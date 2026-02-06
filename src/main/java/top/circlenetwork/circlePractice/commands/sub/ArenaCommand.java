@@ -68,7 +68,7 @@ public class ArenaCommand extends CommandBase {
                     Msg.send(player, "&c用法: /arena kits <add/remove>");
                     return;
                 }
-                switch(args[1]) {
+                switch (args[1]) {
                     case "add" -> {
                         if (args.length < 4) {
                             Msg.send(player, "&c用法: /arena kits add <場地> <模式>");

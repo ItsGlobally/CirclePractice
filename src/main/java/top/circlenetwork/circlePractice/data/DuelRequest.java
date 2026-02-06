@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 @Getter
 @RequiredArgsConstructor
-public class DuelRequest implements Global{
+public class DuelRequest implements Global {
     private final Player from;
     private final Player to;
     @Setter

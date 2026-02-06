@@ -1,6 +1,5 @@
 package top.circlenetwork.circlePractice.data;
 
-import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;

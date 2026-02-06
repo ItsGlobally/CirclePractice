@@ -4,7 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import top.circlenetwork.circlePractice.annotation.CommandInfo;
 import top.circlenetwork.circlePractice.commands.CommandBase;
-import top.circlenetwork.circlePractice.data.Arena;
 import top.circlenetwork.circlePractice.data.Kit;
 import top.circlenetwork.circlePractice.data.PracticePlayer;
 import top.circlenetwork.circlePractice.utils.Msg;
@@ -88,7 +87,7 @@ public class KitCommand extends CommandBase {
                     Msg.send(player, "&c用法: /arena allowedBreakBlocksAroundBed <add/remove>");
                     return;
                 }
-                switch(args[1]) {
+                switch (args[1]) {
                     case "add" -> {
                         if (args.length < 4) {
                             Msg.send(player, "&c用法: /arena allowedBreakBlocksAroundBed add <模式> <方塊>");

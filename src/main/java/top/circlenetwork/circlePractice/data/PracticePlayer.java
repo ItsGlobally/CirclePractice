@@ -23,17 +23,16 @@ public class PracticePlayer implements Global {
     private final Player player;
     @Getter
     private final PlayerData playerData;
+    @Getter
+    private final Map<UUID, DuelRequest> duelRequests = new HashMap<>();
+    @Getter
+    private final Map<UUID, DuelRequest> sentDuelRequests = new HashMap<>();
     @Setter
     @Getter
     private SpawnState state = SpawnState.SPAWN;
     @Setter
     @Getter
     private String queuedKit;
-    @Getter
-    private final Map<UUID, DuelRequest> duelRequests = new HashMap<>();
-    @Getter
-    private final Map<UUID, DuelRequest> sentDuelRequests = new HashMap<>();
-
     /* ================= instance ================= */
     @Getter
     @Setter

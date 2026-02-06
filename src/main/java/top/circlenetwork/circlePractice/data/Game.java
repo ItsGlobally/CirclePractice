@@ -33,7 +33,6 @@ public class Game {
     private boolean ended = false;
 
 
-
     public void broadcast(String msg) {
         for (PracticePlayer player : red.values())
             Msg.send(player.getPlayer(), msg);
